@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import userRoutes from "./Routes/user.routes.js";
+import authRoutes from "./Routes/auth.routes.js";
 
 dotenv.config();
 
@@ -18,7 +19,9 @@ app.use(cookieParser())
 app.get("/", (req, res) => {
   res.send("Welcome to typefreaks")
 })
+
 app.use("/api/user", userRoutes);
+app.use("/api/auth", authRoutes)
 
 const port = process.env.PORT || 5000;
 

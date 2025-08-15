@@ -1,32 +1,30 @@
-import { useEffect } from "react";
-import api from "./lib/axios";
+import { Toaster } from "react-hot-toast";
+import { useAuth } from "./Hooks/useAuth";
+import { Button } from "./components/ui/button";
 
 function App() {
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await api.get("/user/");
-        const data = res.data;
-        if (data.error){
-          console.log("Error in fetch user : ", data.error);
-        }
-        else {
-          console.log("User data fetched : ", data)
-        }
-      } catch (error) {
-        console.log("Error in fetch user : ", error)
-      }
-    }
-  
-    fetchUser();
-  }, []);
+  const { user, signInWithGoogle, signOut, hasCheckedAuth } = useAuth();
+
+  if (!hasCheckedAuth) return (
+    <h1>Checking Authentication please wait...</h1>
+  )
 
   return (
-    <>
-      <h1>You are now the member of the typeminati</h1>
-    </>
-  )  
+    <div style={{ padding: '2rem' }}>
+      <Toaster />
+      <h1>Welcome to Typefreaks</h1>
+      {!user ? (
+        <button onClick={signInWithGoogle}>Sign in with Google</button>
+      ) : (
+        <div>
+          <h2>Welcome, {user.email}</h2>
+          <Button onClick={signOut}>Sign Out</Button>
+          <img src={user.avatar_url} alt="user's google account image"/>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default App;

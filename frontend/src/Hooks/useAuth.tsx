@@ -1,8 +1,19 @@
 import { createContext, useContext } from "react";
-import { type User } from "@supabase/supabase-js";
+import { type User } from "../Types/User";
 
-export const AuthContext = createContext< User | null >(null);
+interface AuthContextType {
+  user: User | null;
+  hasCheckedAuth: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => void;
+}
+
+export const AuthContext = createContext< AuthContextType | null >(null);
 
 export function useAuth() {
-    return useContext(AuthContext)
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
