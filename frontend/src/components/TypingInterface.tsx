@@ -1,143 +1,173 @@
 "use client";
-import { useState, useEffect, useRef, memo } from "react";
-import { motion } from "framer-motion";
+import { useRef, memo } from "react";
+import { motion, useMotionValue, animate } from "framer-motion";
 import { dummyText } from "@/Data/dummy";
 import clsx from "clsx";
 import styles from "./TypingInterface.module.css";
 
-const Char = memo(({ char, status, spanRef }: {
-    char: string;
-    status: "pending" | "correct" | "incorrect" | "current";
-    spanRef?: (el: HTMLSpanElement | null) => void;
-}) => {
-    let style = "text-gray-400";
-    if (status === "correct") style = "text-green-600";
-    if (status === "incorrect") style = "text-red-500 bg-red-100";
-    if (status === "current") style = "text-gray-800";
+type Status = "pending" | "correct" | "incorrect" | "current";
 
+const STATUS_CLASS: Record<Status, string> = {
+  pending: "text-gray-400",
+  correct: "text-blue-600",
+  incorrect: "text-red-500 bg-red-100",
+  current: "text-gray-800",
+};
+
+const Char = memo(
+  ({
+    char,
+    status,
+    spanRef,
+  }: {
+    char: string;
+    status: Status;
+    spanRef?: (el: HTMLSpanElement | null) => void;
+  }) => {
+    const style = STATUS_CLASS[status];
     return (
-        <span ref={spanRef} className={`${style} transition-colors duration-150`}>
-            {char}
-        </span>
+      <span
+        ref={spanRef}
+        className={`${style} transition-colors duration-150`}
+      >
+        {char}
+      </span>
     );
-});
+  }
+);
 
 export default function TypingInterface() {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const characters = dummyText.split("");
-    const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
-    const containerRef = useRef<HTMLDivElement>(null);
+  const characters = dummyText.split("");
 
-    const [status, setStatus] = useState<
-        ("pending" | "correct" | "incorrect" | "current")[]
-    >(() => {
-        const initial = Array(characters.length).fill("pending") as (
-            | "pending"
-            | "correct"
-            | "incorrect"
-            | "current"
-        )[];
-        if (initial.length > 0) initial[0] = "current";
-        return initial;
-    });
+  // Refs for DOM and mutable state (no React re-renders on keystrokes)
+  const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const currentIndexRef = useRef(0);
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Backspace") {
-                if (currentIndex === 0) return;
+  // Motion values for the cursor (imperative spring updates)
+  const left = useMotionValue(0);
+  const top = useMotionValue(1);
 
-                setStatus((prev) => {
-                    const updated = [...prev];
-                    updated[currentIndex] = "pending"; // clear current
-                    updated[currentIndex - 1] = "current"; // go back
-                    return updated;
-                });
+  // Helpers
+  const applyStatus = (index: number, status: Status) => {
+    const el = spanRefs.current[index];
+    if (!el) return;
+    el.className = `${STATUS_CLASS[status]} transition-colors duration-150`;
+  };
 
-                setCurrentIndex((prev) => prev - 1);
-                return;
-            }
+  const clampIndex = (i: number) =>
+    Math.max(0, Math.min(i, characters.length - 1));
 
-            if (e.key.length > 1) return; // ignore special keys
+  const moveCursorToIndex = (i: number) => {
+    const container = containerRef.current;
+    const span = spanRefs.current[clampIndex(i)];
+    if (!container || !span) return;
 
-            const expectedChar = characters[currentIndex];
-            const newChar = e.key;
+    const containerRect = container.getBoundingClientRect();
+    const spanRect = span.getBoundingClientRect();
 
-            setStatus((prev) => {
-                const updated = [...prev];
-                // mark current as correct/incorrect
-                updated[currentIndex] =
-                    newChar === expectedChar ? "correct" : "incorrect";
-                // move cursor
-                if (currentIndex + 1 < characters.length) {
-                    updated[currentIndex + 1] = "current";
-                }
-                return updated;
-            });
+    const x = spanRect.left - containerRect.left;
+    const y = spanRect.top - containerRect.top + 1;
 
-            setCurrentIndex((prev) => prev + 1);
-        };
+    // Smooth spring animations without triggering React re-renders
+    animate(left, x, { type: "spring", stiffness: 300, damping: 30 });
+    animate(top, y, { type: "spring", stiffness: 300, damping: 30 });
+  };
 
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [currentIndex, characters]);
+  const handleBackspace = () => {
+    const i = currentIndexRef.current;
+    if (i === 0) return;
 
-    // Get cursor position relative to container
-    const getCursorPosition = () => {
-        const currentSpan = spanRefs.current[currentIndex];
-        const container = containerRef.current;
+    // Clear current and move caret back
+    applyStatus(i, "pending");
+    applyStatus(i - 1, "current");
 
-        if (!currentSpan || !container) {
-            return { x: 0, y: 1 };
-        }
+    currentIndexRef.current = i - 1;
+    moveCursorToIndex(currentIndexRef.current);
+  };
 
-        const containerRect = container.getBoundingClientRect();
-        const spanRect = currentSpan.getBoundingClientRect();
+  const handleChar = (key: string) => {
+    const i = currentIndexRef.current;
+    if (i >= characters.length) return;
 
-        return {
-            x: spanRect.left - containerRect.left,
-            y: (spanRect.top - containerRect.top) + 1
-        };
-    };
+    const expected = characters[i];
+    const isCorrect = key === expected;
 
-    const cursorPosition = getCursorPosition();
+    // Mark current as correct/incorrect
+    applyStatus(i, isCorrect ? "correct" : "incorrect");
 
-    return (
-        <div className={clsx(styles.textBox, "max-w-3xl mx-auto font-mono text-2xl leading-relaxed relative")} ref={containerRef}>
-            <div className="relative mt-3 ">
-                {characters.map((char, index) => (
-                    <Char
-                        key={index}
-                        char={char}
-                        status={status[index]}
-                        spanRef={(el) => { spanRefs.current[index] = el }}
-                    />
-                ))}
+    // Advance caret if not at end
+    if (i + 1 < characters.length) {
+      applyStatus(i + 1, "current");
+      currentIndexRef.current = i + 1;
+    } else {
+      // Stay at end (optional: keep cursor after last char)
+      currentIndexRef.current = i; 
+    }
 
+    moveCursorToIndex(currentIndexRef.current);
+  };
 
-                {/* Cursor */}
-                <motion.div
-                    className="absolute w-0.5 bg-blue-500"
-                    style={{
-                        height: "1.1em",
-                    }}
-                    animate={{
-                        left: cursorPosition.x,
-                        top: cursorPosition.y,
-                        opacity: [1, 0, 1],
-                    }}
-                    transition={{
-                        left: { type: "spring", stiffness: 300, damping: 30 },
-                        top: { type: "spring", stiffness: 300, damping: 30 },
-                        opacity: {
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "linear",
-                        },
-                    }}
-                />
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Prevent default to avoid space/page scroll and other side effects
+    if (e.key === " " || e.key === "Backspace") e.preventDefault();
 
-            </div>
+    if (e.key === "Backspace") {
+      handleBackspace();
+      return;
+    }
 
-        </div>
-    );
+    // Ignore non-printable keys
+    if (e.key.length !== 1) return;
+
+    handleChar(e.key);
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className={clsx(
+        styles.textBox,
+        "max-w-3xl mx-auto font-mono text-2xl leading-relaxed relative"
+      )}
+    >
+      <div
+        className="relative mt-3 outline-none"
+        tabIndex={0}
+        autoFocus
+        onKeyDown={onKeyDown}
+      >
+        {characters.map((char, index) => (
+          <Char
+            key={index}
+            char={char}
+            status={index === 0 ? "current" : "pending"} // initial only; updates are DOM-only
+            spanRef={(el) => {
+              spanRefs.current[index] = el;
+            }}
+          />
+        ))}
+
+        {/* Cursor (driven by motion values, no re-render on keypress) */}
+        <motion.div
+          className="absolute w-0.5 bg-blue-500"
+          style={{
+            left,
+            top,
+            height: "1.1em",
+          }}
+          animate={{
+            opacity: [1, 0, 1],
+          }}
+          transition={{
+            opacity: {
+              duration: 1,
+              repeat: Infinity,
+              ease: "linear",
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
 }
