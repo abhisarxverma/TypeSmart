@@ -4,6 +4,7 @@ import { type User } from "../Types/User";
 interface AuthContextType {
   user: User | null;
   hasCheckedAuth: boolean;
+  isGettingUser: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => void;
 }

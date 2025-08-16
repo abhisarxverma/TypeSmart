@@ -1,0 +1,13 @@
+.header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    background-color: rgba(255,97,26 / .2);
+}
+
+.logo {
+    aspect-ratio: 1;
+    height: 100%;
+    object-fit: cover;
+}

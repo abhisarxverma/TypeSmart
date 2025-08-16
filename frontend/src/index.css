@@ -1,6 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+html {
+  font-size: clamp(0.875rem, 0.5vw + 1rem, 1.125rem);
+  /* font-size: clamp(10px, 2vw+0.75px, 15px); */
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -110,11 +125,37 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.blue {
+  --background: oklch(19.004% 0.10395 263.698);
+  --foreground: oklch(43.236% 0.2518 264.947);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-caption {
+    @apply text-[0.75rem];
+  }
+  .text-body-sm {
+    @apply text-[0.875rem];
+  }
+  .text-base {
+    @apply text-[1rem];
+  }
+  .text-subheading {
+    @apply text-[1.25rem];
+  }
+  .text-heading {
+    @apply text-[1.5rem];
+  }
+  .text-hero {
+    @apply text-[2rem];
   }
 }

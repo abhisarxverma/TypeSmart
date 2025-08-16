@@ -2,12 +2,24 @@ import { useEffect, useState, type ReactNode } from 'react';
 import supabase from "../lib/supabaseClient.ts";
 import { AuthContext } from '../Hooks/useAuth.tsx';
 import api from '../lib/axios.ts';
-import type { User } from '../Types/User.ts';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getRealUser } from '@/lib/queries.tsx';
 
 function AuthProvider({ children }: { children: ReactNode }) {
 
-  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [hasCheckedAuth, setHasCheckedAuth] = useState<boolean>(false);
+
+  const queryClient = useQueryClient();
+
+  const { data: user, isLoading: isGettingUser, refetch } = useQuery({
+    queryKey: ["user"],
+    queryFn: getRealUser,
+    enabled: !!token,
+    retry: false,
+  })
+
+  console.log("USER : ", user)
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -20,7 +32,8 @@ function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.signOut()
       .then(() => {
         delete api.defaults.headers.common['Authorization'];
-        setUser(null);
+        setToken(null);
+        queryClient.removeQueries({queryKey: ["user"]});
         setHasCheckedAuth(true);
       })
       .catch((error) => {
@@ -28,28 +41,12 @@ function AuthProvider({ children }: { children: ReactNode }) {
       });
   }
 
-
-  async function getRealUser() {
-    try {
-      const res = await api.get("/auth/getuser");
-      const data = res.data;
-      console.log("Getting user fetch result : ", data)
-      if (data.error) {
-        console.log("Error in getting real user : ", data.error);
-      }
-      setUser(data);
-    } catch (error) {
-      console.log("Error in Get real user : ", error);
-    } finally {
-      setHasCheckedAuth(true);
-    }
-  }
-
   useEffect(() => {
     const getUserAndSetToken = async () => {
       const { data: { user: rawUser }, error } = await supabase.auth.getUser();
       if (error) {
         console.error("Error in auth provider getting user : ", error.message);
+        setHasCheckedAuth(true);
         return;
       }
 
@@ -57,36 +54,39 @@ function AuthProvider({ children }: { children: ReactNode }) {
         console.log("RAWUSER : ", rawUser);
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token;
-        // console.log("ACCESS TOKEN : ", token)
         if (token) {
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          await getRealUser();
+          setToken(token);
         }
       } else {
         delete api.defaults.headers.common['Authorization'];
       }
+      setHasCheckedAuth(true);
     };
-
+    
     getUserAndSetToken();
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.access_token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${session.access_token}`;
+      const newToken = session?.access_token;
+      if (newToken) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        setToken(newToken)
+        refetch();
       } else {
         delete api.defaults.headers.common['Authorization'];
-        setUser(null);
-        setHasCheckedAuth(true);
+        setToken(null);
+        refetch();
       }
     });
 
     return () => {
       listener.subscription.unsubscribe();
     };
-  }, []);
+  }, [refetch]);
 
   return (
 
-    <AuthContext.Provider value={{ user, hasCheckedAuth, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, hasCheckedAuth, signInWithGoogle, signOut, isGettingUser }}>
       {children}
     </AuthContext.Provider>
   );

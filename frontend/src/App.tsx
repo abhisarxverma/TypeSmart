@@ -1,29 +1,32 @@
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "./Hooks/useAuth";
-import { Button } from "./components/ui/button";
+import { Route, Routes } from "react-router-dom";
+import { LuLoaderCircle } from "react-icons/lu";
+import HomePage from "./Pages/HomePage";
+import AuthPage from "./Pages/AuthPage";
+import { ProtectedRoute, CheckIsAuthed } from "./utils/protection";
+import Layout from "./components/Layout";
 
 function App() {
 
-  const { user, signInWithGoogle, signOut, hasCheckedAuth } = useAuth();
+  const { hasCheckedAuth, isGettingUser } = useAuth();
 
-  if (!hasCheckedAuth) return (
-    <h1>Checking Authentication please wait...</h1>
+  if (!hasCheckedAuth || isGettingUser) return (
+    <div className="h-screen flex items-center justify-center">
+      <LuLoaderCircle className="animate-spin text-black text-5xl" />
+    </div>
   )
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <>
       <Toaster />
-      <h1>Welcome to Typefreaks</h1>
-      {!user ? (
-        <button onClick={signInWithGoogle}>Sign in with Google</button>
-      ) : (
-        <div>
-          <h2>Welcome, {user.email}</h2>
-          <Button onClick={signOut}>Sign Out</Button>
-          <img src={user.avatar_url} alt="user's google account image"/>
-        </div>
-      )}
-    </div>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          <Route path="/login-signup" element={<CheckIsAuthed><AuthPage /></CheckIsAuthed>} />
+        </Routes>
+      </Layout>
+    </>
   )
 }
 
