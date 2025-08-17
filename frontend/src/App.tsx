@@ -6,6 +6,7 @@ import HomePage from "./Pages/HomePage";
 import AuthPage from "./Pages/AuthPage";
 import { ProtectedRoute, CheckIsAuthed } from "./utils/protection";
 import Layout from "./components/Layout";
+import LibraryPage from "./Pages/LibraryPage";
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/login-signup" element={<CheckIsAuthed><AuthPage /></CheckIsAuthed>} />
+          <Route path="/library" element={<LibraryPage />} />
         </Routes>
       </Layout>
     </>

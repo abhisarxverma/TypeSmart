@@ -1,9 +1,9 @@
 "use client";
-import { useRef, memo } from "react";
+import { useRef, memo, useEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
-import { dummyText } from "@/Data/dummy";
 import clsx from "clsx";
 import styles from "./TypingInterface.module.css";
+import { useTypingText } from "@/Hooks/useTypingText";
 
 type Status = "pending" | "correct" | "incorrect" | "current";
 
@@ -37,7 +37,12 @@ const Char = memo(
 );
 
 export default function TypingInterface() {
-  const characters = dummyText.split("");
+
+  const { typingText } = useTypingText();
+
+  console.log("TYPING TEXT : ", typingText);
+
+  const characters = typingText.split("");
 
   // Refs for DOM and mutable state (no React re-renders on keystrokes)
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -123,12 +128,16 @@ export default function TypingInterface() {
     handleChar(e.key);
   };
 
+  useEffect(() => {
+    if (characters.length > 0) moveCursorToIndex(0);
+  })
+
   return (
     <div
       ref={containerRef}
       className={clsx(
         styles.textBox,
-        "max-w-3xl mx-auto font-mono text-2xl leading-relaxed relative"
+        "max-w-3xl mx-auto font-mono text-heading leading-relaxed relative"
       )}
     >
       <div
