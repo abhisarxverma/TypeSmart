@@ -55,7 +55,7 @@ const Char = memo(
         ref={spanRef}
         className={clsx(STATUS_CLASS[status], "transition-colors duration-150")}
         style={{
-          display: "inline-block",
+          display: "inline",
           width: `auto`,
         }}
       >
@@ -285,8 +285,7 @@ export default function TypingInterfaceVirtual({
         M
       </span>
 
-      <div
-        className={clsx(textClassName, styles.textBox, "max-w-3xl")}
+      <motion.div
         style={{ position: "relative", height: rowVirtualizer.getTotalSize(), textAlign: "justify", textJustify: "inter-word" }}
         ref={contentRef}
         {...focusableLayerProps}
@@ -338,7 +337,7 @@ export default function TypingInterfaceVirtual({
           animate={{ opacity: [1, 0, 1] }}
           transition={{ opacity: { duration: 1, repeat: Infinity, ease: "linear" } }}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }
