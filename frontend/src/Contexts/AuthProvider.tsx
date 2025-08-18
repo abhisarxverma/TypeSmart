@@ -19,7 +19,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     retry: false,
   })
 
-  console.log("USER : ", user)
+  // console.log("USER : ", user)
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -51,7 +51,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (rawUser) {
-        console.log("RAWUSER : ", rawUser);
+        // console.log("RAWUSER : ", rawUser);
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token;
         if (token) {

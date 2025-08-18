@@ -157,6 +157,10 @@ body {
     @apply text-[1.25rem];
   }
 
+  .section-heading {
+    @apply text-[1rem];
+  }
+
   .text-heading {
     @apply text-[1.5rem];
   }

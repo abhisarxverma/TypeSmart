@@ -8,11 +8,15 @@ export default function Header() {
 
     return (
         <header className={clsx(styles.header, "text-heading")}>
-            <BsKeyboardFill />
-            <p className={clsx(styles.title)}>Typefreaks</p>
-            <Button asChild>
-                <Link to="/library">Change text</Link>
-            </Button>
+            <div className={clsx(styles.textGroup)}>
+                <BsKeyboardFill size={"2.5rem"}/>
+                <p className={clsx(styles.title)}>Typefreaks</p>
+            </div>
+            <div className={clsx(styles.buttons)}>
+                <Button asChild>
+                    <Link to="/library">Change text</Link>
+                </Button>
+            </div>
         </header>
     )
 }

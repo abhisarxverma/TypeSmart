@@ -1,7 +1,14 @@
 import { Router } from "express";
 import requireAuth from "../Middlewares/requireAuth.js";
+import { createFolder, getLibrary, uploadFile } from "../Controllers/user.controller.js";
 
 const router = Router();
+
+router.post("/upload_file", requireAuth, uploadFile);
+
+router.get("/library", requireAuth, getLibrary);
+
+router.post("/create_folder", requireAuth, createFolder)
 
 router.post("/increment_avg_wpm", requireAuth, async (req, res) => {
     try {

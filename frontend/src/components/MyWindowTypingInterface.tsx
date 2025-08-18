@@ -5,14 +5,15 @@ import { motion, useMotionValue, animate } from "framer-motion";
 import clsx from "clsx";
 import styles from "./TypingInterface.module.css";
 import { useTypingText } from "@/Hooks/useTypingText";
+import toast from "react-hot-toast";
 
 type Status = "pending" | "correct" | "incorrect" | "current";
 
 const STATUS_CLASS: Record<Status, string> = {
   pending: "text-gray-400",
-  correct: "text-blue-600",
-  incorrect: "text-red-500 bg-red-100",
-  current: "text-gray-800",
+  correct: "text-foreground",
+  incorrect: "text-red-500",
+  current: "text-orange-200",
 };
 
 export type WindowConfig = {
@@ -23,7 +24,7 @@ export type WindowConfig = {
 
 // Default: 3 lines window
 const WINDOW: WindowConfig = {
-  lines: 3,
+  lines: 5,
   overscan: 1,
   edgePadding: 1,
 };
@@ -163,6 +164,7 @@ export default function TypingInterface() {
       currentIndexRef.current = i + 1;
     } else {
       currentIndexRef.current = i;
+      toast.success("Completed typing")
     }
 
     updateWindowForIndex(currentIndexRef.current);
