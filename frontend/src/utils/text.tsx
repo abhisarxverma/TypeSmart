@@ -14,10 +14,12 @@ export function normalizeForTyping(input: string): string {
     .replace(/[\u2013\u2014]/g, "-")   // – — → -
     .replace(/\u2026/g, "...");       // … → ...
 
-  // Collapse excessive spaces and tabs (but keep single spaces/newlines)
-  t = t.replace(/[\t\f\v]+/g, " ").replace(/ {2,}/g, " ");
+  // Collapse excessive horizontal whitespace (tabs, multiple spaces), but preserve newlines
+  t = t
+    .replace(/[ \t\f\v]+/g, " ")       // Replace tabs and other horizontal whitespace with single space
+    .replace(/ {2,}/g, " ");           // Collapse multiple spaces into one
 
-  // Optionally strip non-typable symbols (keep common punctuation)
+  // Optionally strip non-typable symbols (keep common punctuation and newlines)
   t = t.replace(/[^.,!?;:'"()\[\]{}<>\-_\/@#*$%+=A-Za-z0-9 \n]/g, "");
 
   return t;

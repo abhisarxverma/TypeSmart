@@ -1,17 +1,18 @@
 import clsx from "clsx";
 import styles from "./LibraryPage.module.css";
-import FileUploader from "@/components/FileUploader";
+import FileUploader from "@/components/NewUpload";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { Loader2, SearchIcon } from "lucide-react";
 import File from "@/components/File";
 import { Button } from "@/components/ui/button";
-import { BsFolderPlus } from "react-icons/bs";
-import useSubjectSelect from "@/Hooks/useSubjectSelect";
-import type { File as FileType, Folder as FolderType } from "@/Types/Library";
-import CreateFolderEl from "@/components/CreateFolder";
-import { CiFolderOn } from "react-icons/ci";
-import { HiOutlineFolderPlus } from "react-icons/hi2";
+import type { File as FileType, Folder } from "@/Types/Library";
+import { BsFileEarmarkPlus } from "react-icons/bs";
+import SubjectSelect from "@/components/SubjectSelect";
+import { useState } from "react";
+import FoldersCommand from "@/components/FoldersCommand";
+import { getSubjects } from "@/utils/files";
+import { LuLibraryBig } from "react-icons/lu";
 
 export default function LibraryPage() {
 
@@ -31,9 +32,22 @@ export default function LibraryPage() {
         },
     })
 
-    const { currentSubject, SubjectSelect } = useSubjectSelect({ library: library ?? { files: [], folders: [] } });
+    const [currentSubject, setCurrentSubject] = useState<string>("All");
 
-    const els = library?.files?.map((obj: FileType) => {
+    const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+    
+    const subjects = getSubjects(selectedFolder?.files || library?.files);
+
+    let files;
+
+    if (selectedFolder === null) {
+        files = library?.files;
+    }
+    else {
+        files = library?.folders?.filter((folder: Folder) => folder.id === selectedFolder.id)[0].files
+    }
+
+    const fileEls = files?.map((obj: FileType) => {
         if (currentSubject === "All") return (
             <File key={obj.id} text={obj.text} title={obj.title} subject={obj.subject} />
         )
@@ -46,52 +60,50 @@ export default function LibraryPage() {
 
     return (
         <>
-            <h1 className={clsx(styles.title, "text-foreground text-heading")}>Your Library</h1>
+            <h1 className={clsx(styles.title, "text-foreground text-heading flex items-center gap-1")}>
+                <LuLibraryBig />
+                <span>Your Library</span>
+            </h1>
+            <div className={clsx(styles.folderBar)}>
+                <div className="flex flex-col">
+                    <span className="text-caption font-bold">Folder</span>
+                    <p className="text-subheading mt-[-.3rem]">{selectedFolder?.name ?? "Home"}</p>
+                </div>
+                <FoldersCommand folders={library?.folders ?? []} clickFn={setSelectedFolder} />
+            </div>
             <div className={clsx(styles.container)}>
-                <div className={clsx(styles.foldersContainer)}>
-                    <div className="flex items-center gap-2 justify-between">
-                        <p className="section-heading">Folders</p>
-                        <CreateFolderEl>
-                            <HiOutlineFolderPlus />
-                        </CreateFolderEl>
+                <div className={clsx(styles.filesContainer)}>
+                    <h3 className="section-heading">Files in {selectedFolder?.name ?? "Home"}</h3>
+                    <div className={clsx(styles.topBar)}>
+                        <div className={clsx(styles.searchBar, "flex items-center gap-2")}>
+                            <SearchIcon size={"1rem"} />
+                            <input className={clsx(styles.searchInput)} type="text" placeholder="Search" />
+                        </div>
+                        <SubjectSelect currentSubject={currentSubject} clickFn={setCurrentSubject} customClass={clsx(styles.subjectSelect)} subjects={subjects} />
+
+                        <FileUploader folder_id={selectedFolder?.id ? selectedFolder?.id : null}>
+                            <Button className={clsx("flex items-center gap-2", styles.addFileButton)}>
+                                <BsFileEarmarkPlus className="font-bold" />
+                                <span>Add File</span>
+                            </Button>
+                        </FileUploader>
                     </div>
-                    {library?.folders?.length > 0 ? (
-                        <>
-                            {library?.folders?.map((folder: FolderType) => {
-                                return (
-                                    <Button variant={"secondary"} className="flex items-center justify-start gap-2">
-                                        <CiFolderOn />
-                                        <span>{folder.name}</span>
-                                    </Button>
-                                )
-                            })}
-                        </>
+                    {fileEls?.length > 0  ? (
+                        <div className={clsx(styles.filesList, "rounded-md")}>
+                            {isFetchingLibrary && <Loader2 className="animate-spin" />}
+                            {fileEls}
+                        </div>
                     ) : (
-                        <div className="flex flex-col gap-1 mt-1">
-                            <p className="text-body-sm">No folders</p>
-                            <CreateFolderEl>
-                                <Button className="w-full text-start flex justify-start gap-3" variant="secondary"><BsFolderPlus /><span>New Folder</span></Button>
-                            </CreateFolderEl>
+                        <div className={clsx(styles.noFileBox)}>
+                            <p>No files.</p>
+                            <FileUploader folder_id={selectedFolder?.id ?? null}>
+                                <Button className="flex items-center gap-2">
+                                    <BsFileEarmarkPlus className="font-bold" />
+                                    <span>Add First File</span>
+                                </Button>
+                            </FileUploader>
                         </div>
                     )}
-
-                </div>
-                <div className={clsx(styles.filesContainer)}>
-                    <h3 className="section-heading">Files in Home</h3>
-                    <div className={clsx(styles.topBar)}>
-                        <div className={clsx(styles.filterGroup)}>
-                            <div className={clsx(styles.searchBar, "flex items-center gap-2")}>
-                                <SearchIcon />
-                                <input type="text" placeholder="Search" />
-                            </div>
-                            <SubjectSelect />
-                        </div>
-                        <FileUploader />
-                    </div>
-                    <div className={clsx(styles.filesList, "rounded-md")}>
-                        {isFetchingLibrary && <Loader2 className="animate-spin" />}
-                        {els}
-                    </div>
                 </div>
             </div>
         </>

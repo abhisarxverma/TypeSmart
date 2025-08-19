@@ -16,20 +16,22 @@ import { Button } from "./ui/button";
 import clsx from "clsx";
 import styles from "./FileUploader.module.css";
 import { Input } from "@/components/ui/input"
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
-import { PiFilePlusLight } from "react-icons/pi";
+import { Loader } from "lucide-react";
 
-// 👇 tell pdfjs where its worker lives
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 
-export default function FileUploader() {
+export default function FileUploader({ children, folder_id }: { children: React.ReactNode, folder_id: string | null}) {
     const [text, setText] = useState<string | null>(null);
     const [title, setTitle] = useState<string>("");
     const [subject, setSubject] = useState<string>("");
     const [file, setFile] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [open, setOpen] = useState<boolean>(false);
+
+    const queryClient = useQueryClient();
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -74,7 +76,8 @@ export default function FileUploader() {
                 const res = await api.post("/user/upload_file", {
                     title: title,
                     text: text,
-                    subject: subject
+                    subject: subject,
+                    folder_id: folder_id
                 });
                 const data = res.data;
                 // console.log("UPLOAD FILE RESULT : ", data);
@@ -89,6 +92,10 @@ export default function FileUploader() {
         },
         onError : (error ) => {
             console.log("Error in upload file : ",error);
+        },
+        onSuccess: () => {
+            setOpen(false);
+            queryClient.invalidateQueries({ queryKey : ["library"] });
         }
     })
 
@@ -100,17 +107,13 @@ export default function FileUploader() {
 
     return (
         <>
-
-            <Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button className="flex items-center gap-2">
-                        <PiFilePlusLight />
-                        <span>Add File</span>
-                    </Button>
+                    { children }
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Add new text for typing</DialogTitle>
+                        <DialogTitle>Add New Text</DialogTitle>
                         <DialogDescription>
 
                         </DialogDescription>
@@ -142,7 +145,7 @@ export default function FileUploader() {
                         placeholder="Enter subject"
                         value={subject}
                     />
-                    <Button onClick={handleUpload}>{ isUploading ? "Uploading...": "Upload" }</Button>
+                    <Button onClick={handleUpload}>{ isUploading ? <Loader className="animate-spin" /> : "Upload" }</Button>
                 </DialogContent>
             </Dialog>
         </>

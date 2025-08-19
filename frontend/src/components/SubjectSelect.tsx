@@ -7,20 +7,22 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import type { Library } from "@/Types/Library"
-import { getSubjects } from "@/utils/files";
-import { useState } from "react"
+} from "@/components/ui/select";
+import clsx from "clsx";
 
-export default function useSubjectSelect({ library }: { library: Library }) {
+interface SubjectSelectProps {
+    subjects: string[]
+    customClass: string
+    currentSubject: string
+    clickFn : React.Dispatch<React.SetStateAction<string>> 
+}
 
-    const [currentSubject, setCurrentSubject] = useState<string>("All");
+export default function SubjectSelect({ subjects, customClass, currentSubject, clickFn }: SubjectSelectProps) {
 
-    const subjects = getSubjects(library);
 
-    const SubjectSelect = () => (
-        <Select onValueChange={(value) => setCurrentSubject(value)} value={currentSubject ?? undefined}>
-            <SelectTrigger className="w-[180px]">
+    return (
+        <Select onValueChange={(value) => clickFn(value)} value={currentSubject ?? undefined}>
+            <SelectTrigger className={clsx(customClass)}>
                 <SelectValue placeholder="Filter by subject" />
             </SelectTrigger>
             <SelectContent>
@@ -35,5 +37,4 @@ export default function useSubjectSelect({ library }: { library: Library }) {
         </Select>
     )
 
-    return { SubjectSelect, currentSubject }
 }
