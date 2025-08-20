@@ -7,6 +7,7 @@ import AuthProvider from './Contexts/AuthProvider.tsx'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ThemeProvider } from './Contexts/Theme/ThemeProvider.tsx';
 import TypingTextProvider from './Contexts/TypingTextProvider.tsx';
+import CurrentFolderProvider from './Contexts/CurrentFolder.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,7 +24,9 @@ createRoot(document.getElementById('root')!).render(
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <AuthProvider>
               <TypingTextProvider>
-                  <App />
+                <CurrentFolderProvider>
+                    <App />
+                </CurrentFolderProvider>
               </TypingTextProvider>
             </AuthProvider>
           </ThemeProvider>

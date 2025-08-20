@@ -23,7 +23,7 @@ export default function File({ title, text, subject }: FileProps) {
     }
 
     return (
-        <div onClick={handleClick} className={clsx(styles.container, "bg-accent border-1 border-foreground")}>
+        <div onClick={handleClick} className={clsx(styles.container, "bg-accent border-1 border-accent")}>
 
             <CiFileOn className={clsx(styles.fileIcon, "text-zinc-500")} />
             
