@@ -10,7 +10,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
                 <h1 className={clsx("text-heading")}>Typing Interface</h1>
                 <Button asChild>
-                    <Link to="/library">Change text</Link>
+                    <Link to="/library/home">Change text</Link>
                 </Button>
             </div>
             <TypingInterface />

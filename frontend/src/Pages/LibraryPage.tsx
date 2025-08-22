@@ -1,61 +1,43 @@
 import clsx from "clsx";
 import styles from "./LibraryPage.module.css";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
 import { Loader2, SearchIcon } from "lucide-react";
 import { getSubjects } from "@/utils/files";
 import { LuLibraryBig } from "react-icons/lu";
-import { useCurrentFolder } from "@/Hooks/useCurrentFolder";
+import { useLibrary } from "@/Hooks/useLibrary";
 import File from "@/components/File";
 import type { File as FileType, Folder } from "@/Types/Library";
 import NewUploadButton from "@/components/NewUploadButton";
 import SubjectSelect from "@/components/SubjectSelect";
 import FoldersCommand from "@/components/FoldersCommand";
+import { useParams } from "react-router-dom";
 
 export default function LibraryPage() {
 
-    const { data: library, isLoading: isFetchingLibrary } = useQuery({
-        queryKey: ["library"],
-        queryFn: async () => {
-            try {
-                const res = await api.get("/user/library");
-                const data = res.data;
-                console.log("Library fetch result : ", data);
-                if (data.error) throw new Error(data.error);
-                return data;
-            } catch (error) {
-                console.log("Error in library fetch query : ", error)
-                throw new Error(error.response.data.error);
-            }
-        },
-    })
+    const { library, isFetchingLibrary } = useLibrary();
 
     const [currentSubject, setCurrentSubject] = useState<string>("All");
 
-    const { currentFolder, setCurrentFolder } = useCurrentFolder();
+    const { folderName } = useParams();
 
-    const subjects = getSubjects(currentFolder?.files || library?.files);
+    const currentFolder =
+    folderName === "home"
+            ? null
+            : library?.folders?.find((f: Folder) => f.name === folderName) ?? null;
+            
+    const subjects = getSubjects(currentFolder?.files || library?.files || []);
 
-    let files;
+    const files = currentFolder
+        ? currentFolder.files ?? []
+        : library?.files ?? [];
 
-    if (currentFolder === null) {
-        files = library?.files;
-    }
-    else {
-        files = library?.folders?.filter((folder: Folder) => folder.id === currentFolder.id)[0].files
-    }
 
-    const fileEls = files?.map((obj: FileType) => {
-        if (currentSubject === "All") return (
-            <File key={obj.id} text={obj.text} title={obj.title} subject={obj.subject} />
-        )
-        else if (obj.subject === currentSubject) {
-            return (
-                <File key={obj.id} text={obj.text} title={obj.title} subject={obj.subject} />
-            )
-        }
-    })
+    const fileEls = files?.filter(
+        (obj: FileType) => currentSubject === "All" || obj.subject === currentSubject
+    ).map((obj: FileType) => (
+        <File key={obj.id} {...obj} />
+    ));
+
 
     return (
         <>
@@ -68,19 +50,19 @@ export default function LibraryPage() {
                     <span className="text-caption font-bold">Folder</span>
                     <p className="text-subheading mt-[-.3rem]">{currentFolder?.name ?? "Home"}</p>
                 </div>
-                <FoldersCommand folders={library?.folders ?? []} clickFn={setCurrentFolder} />
+                <FoldersCommand folders={library?.folders ?? []} />
             </div>
             <div className={clsx(styles.container)}>
                 <div className={clsx(styles.filesContainer)}>
                     <h3 className="section-heading">Files in {currentFolder?.name ?? "Home"}</h3>
                     <div className={clsx(styles.topBar)}>
-                        <div className={clsx(styles.searchBar, "flex items-center gap-2")}>
+                        <div className={clsx(styles.searchBar)}>
                             <SearchIcon size={"1rem"} />
                             <input className={clsx(styles.searchInput)} type="text" placeholder="Search" />
                         </div>
                         <SubjectSelect currentSubject={currentSubject} clickFn={setCurrentSubject} customClass={clsx(styles.subjectSelect)} subjects={subjects} />
 
-                        <NewUploadButton additionalClasses={clsx(styles.addFileButton, "bg-foreground text-background px-3 py-1 rounded-md text-body-sm font-semibold  flex items-center gap-1")} />
+                        <NewUploadButton folderName={folderName ?? "Home"} additionalClasses={clsx(styles.addFileButton, "bg-foreground text-background px-3 py-1 rounded-md text-body-sm font-semibold")} />
                     </div>
                     {isFetchingLibrary || fileEls?.length > 0 ? (
                         <div className={clsx(styles.filesList, "rounded-md")}>
@@ -90,7 +72,7 @@ export default function LibraryPage() {
                     ) : (
                         <div className={clsx(styles.noFileBox)}>
                             <p>No files.</p>
-                            <NewUploadButton additionalClasses="" />
+                            <NewUploadButton folderName={folderName ?? "Home"} additionalClasses="" />
                         </div>
                     )}
                 </div>

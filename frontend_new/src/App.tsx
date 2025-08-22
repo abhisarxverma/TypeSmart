@@ -2,12 +2,10 @@ import { Toaster } from "react-hot-toast";
 import { useAuth } from "./Hooks/useAuth";
 import { Route, Routes } from "react-router-dom";
 import { LuLoaderCircle } from "react-icons/lu";
-import HomePage from "./Pages/HomePage";
-import AuthPage from "./Pages/AuthPage";
-import { ProtectedRoute, CheckIsAuthed } from "./utils/protection";
-import Layout from "./components/Layout";
-import LibraryPage from "./Pages/LibraryPage";
-import PdfUploader from "./Pages/New_upload/AddNewFile";
+import AuthPage from "./Pages/Auth/AuthPage";
+import { ProtectedRoute, CheckIsAuthed } from "./Utils/protection";
+import Layout from "./components/Layout/Layout";
+import HomePage from "./Pages/Home/HomePage";
 
 function App() {
 
@@ -26,8 +24,6 @@ function App() {
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/login-signup" element={<CheckIsAuthed><AuthPage /></CheckIsAuthed>} />
-          <Route path="/library/:folderName/add-new" element={<PdfUploader />} />
-          <Route path="/library/:folderName" element={<LibraryPage />} />
         </Routes>
       </Layout>
     </>

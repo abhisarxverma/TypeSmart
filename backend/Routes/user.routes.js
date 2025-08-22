@@ -34,4 +34,32 @@ router.post("/increment_avg_wpm", requireAuth, async (req, res) => {
     }
 })
 
+router.get("/add_in_group", requireAuth, async (req, res) => {
+    console.log("REQUEST CAME IN !")
+    try {
+        const sb = req.sb;
+
+        const text_id = "11111111-1111-1111-1111-111111111111";
+        const group_id = "aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+
+        const { data, error } = await sb
+        .from("group_texts")
+        .insert({
+            text_id,
+            group_id
+        }).select("*").single()
+
+        if (error) {
+            console.log("Error in Inserting : ", error);
+            return res.status(500).json({ "error" : "Unexpected Internal server error"});
+        }
+
+        return res.status(200).json(data);
+
+    } catch (error) {
+        console.log("Error in Inserting : ", error)
+        return res.status(500).json({ "error" : "Unexpected Internal Server Error" });
+    }
+})
+
 export default router;

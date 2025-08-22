@@ -12,19 +12,19 @@ import { Button } from "@/components/ui/button";
 import { MdOutlineFolder } from "react-icons/md";
 import CreateFolderEl from "./CreateFolder";
 import { IoHomeOutline } from "react-icons/io5";
+import { useNavigate} from "react-router-dom";
 
 export default function FoldersCommand({
     folders,
-    clickFn,
 }: {
-    folders: Folder[];
-    clickFn: React.Dispatch<React.SetStateAction<Folder | null>>;
-}) {
+    folders: Folder[];}) {
     const [open, setOpen] = useState(false);
 
+    const navigate = useNavigate();
+
     const handleSelect = (folder: Folder | null) => {
-        clickFn(folder);
         setOpen(false);
+        navigate("/library/"+(folder ? folder.name : "Home"))
     };
 
     return (

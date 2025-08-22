@@ -5,7 +5,7 @@ export const uploadFile = async (req, res) => {
 
     try {
 
-        const { title, text, subject, folder_id } = req.body;
+        const { title, text, subject, group_id, importance } = req.body;
 
         console.log("Folder id : ", folder_id)
 
@@ -13,42 +13,46 @@ export const uploadFile = async (req, res) => {
             return res.json({ error: "Incomplete details provided to upload file" })
         }
 
-        const findDuplicateQuery = sb.from("files").select("*").eq("title", title);
-
-        if (folder_id) {
-            findDuplicateQuery.eq("folder_id", folder_id);
-        } else {
-            findDuplicateQuery.is("folder_id", null);
-        }
-
-        const { data: existingFile, error: fetchError } = await findDuplicateQuery;
-
-
-        if (fetchError) {
-            console.log("Error checking for duplicate files : ", fetchError);
-            return res.status(500).json({ error: "Unexpected server error" })
-        }
-
-        if (existingFile.length >= 1) {
-            return res.status(301).json({ error: "File with this name already exits" })
-        }
-
-        const { data: insertedFileRow, error } = await sb
-            .from("files")
+        const { data: insertedText, error } = await sb
+            .from("texts")
             .insert({
                 user_id: user.id,
                 title: title,
                 text: text,
                 subject: subject,
-                folder_id: folder_id || null
+                importance: importance
             }).select("*").single();
 
         if (error) {
-            console.log("Error in inserting new file : ", error);
+            console.log("Error in inserting new text : ", error);
             return res.status(500).json({ error: "Unexpected server error" });
         }
 
-        return res.status(200).json(insertedFileRow)
+        if (group_id){
+            const { data: group, error: groupFindError } = await sb
+                .from("groups")
+                .select("*")
+                .eq("group_id", group_id).single();
+
+            if (groupFindError) {
+                console.log("Error in finding group : ", groupFindError);
+                return res.status(500).json({ error : "Unexpected Internal Server Error" });
+            }
+
+            const { data: GroupTextRow, error: GroupTextError } = await sb
+            .from("group_texts")
+            .insert({
+                text_id: insertedText.id,
+                group_id: group_id
+            });
+
+            if (GroupTextError) {
+                console.log("Error in adding in group : ", GroupTextError);
+                return res.status(500).json({ error : "Unexpected Internal Server Error" });
+            }
+        }
+
+        return res.status(200).json(insertedText)
 
     } catch (error) {
         console.log("Error in upload file controller : ", error);

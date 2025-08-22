@@ -150,7 +150,7 @@ export default function TypingInterface() {
           <Char
             key={index}
             char={char}
-            status={index === 0 ? "current" : "pending"} // initial only; updates are DOM-only
+            status={index === 0 ? "current" : "pending"} 
             spanRef={(el) => {
               spanRefs.current[index] = el;
             }}

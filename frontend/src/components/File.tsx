@@ -29,7 +29,7 @@ export default function File({ title, text, subject }: FileProps) {
             
             <div className={styles.textGroup}>
                 <h1 className={clsx(styles.fileName, "text-body-sm")}>{title}</h1>
-                <p className={clsx(styles.subject, "text-body-sm")}>{subject}</p>
+                <p className={clsx(styles.subject, "text-caption")}>{subject}</p>
             </div>
         </div>
     )

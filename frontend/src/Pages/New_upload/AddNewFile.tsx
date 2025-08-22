@@ -6,20 +6,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
-import { useCurrentFolder } from "@/Hooks/useCurrentFolder";
+import { useLibrary } from "@/Hooks/useLibrary";
 import { FaRegFilePdf } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker?url";
 import * as pdfjsLib from "pdfjs-dist";
 import { normalizeForTyping } from "@/utils/text";
 import { toast } from "react-hot-toast";
+import { Loader } from "lucide-react";
+import { useParams } from "react-router-dom";
+import type { Folder } from "@/Types/Library";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 type Mode = "idle" | "needsRange" | "ready";
 
 export default function PdfUploader() {
-    // form & flow state
+
+    const { library, isFetchingLibrary } = useLibrary();
+    const { folderName } = useParams();
+
+    const currentFolder =
+        folderName === "home"
+            ? null
+            : library?.folders?.find((f: Folder) => f.name === folderName) ?? null;
+
+    // form states
     const [title, setTitle] = useState("");
     const [subject, setSubject] = useState("");
     const [text, setText] = useState<string>("");
@@ -38,7 +50,6 @@ export default function PdfUploader() {
     const inputRef = useRef<HTMLInputElement>(null);
     const pdfDocRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
 
-    const { currentFolder } = useCurrentFolder();
     const queryClient = useQueryClient();
 
     // --- react-query mutation: confirm upload ---
@@ -57,7 +68,6 @@ export default function PdfUploader() {
         onSuccess: () => {
             toast.success(`${title} uploaded successfully`);
             queryClient.invalidateQueries({ queryKey: ["library"] });
-            // reset minimal bits
             setText("");
             setTitle("");
             setSubject("");
@@ -84,7 +94,6 @@ export default function PdfUploader() {
         const f = e.target.files?.[0];
         if (!f) return;
 
-        // revoke previous URL if any
         if (fileUrl) URL.revokeObjectURL(fileUrl);
 
         const nextUrl = URL.createObjectURL(f);
@@ -170,6 +179,12 @@ export default function PdfUploader() {
         return Boolean(title && subject && text && !isUploading);
     }, [title, subject, text, isUploading]);
 
+    if (isFetchingLibrary) return (
+        <div className="min-h-screen flex items-center justify-center">
+            <Loader className="animate-spin" size={"2rem"} />
+        </div>
+    )
+
     return (
         <section className={styles.container}>
             <div>
@@ -177,9 +192,9 @@ export default function PdfUploader() {
                     <span className="text-caption font-bold">Folder</span>
                     <span className="text-subheading mt-[-.3rem]">{currentFolder?.name ?? "Home"}</span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 md:mb-0">
                     <p className="text-heading font-bold my-3">Add new file</p>
-                    <div className="flex items-center gap-1 border-1 rounded-md p-1">
+                    <div className="flex items-center gap-1 border-1 rounded-md">
                         <Button variant={`${fileType === "pdf" ? "secondary" : "outline"}`} onClick={() => setFileType("pdf")}>Pdf</Button>
                         <Button variant={`${fileType === "txt" ? "secondary" : "outline"}`} onClick={() => setFileType("txt")}>Txt File</Button>
                         <Button variant={`${fileType === null ? "secondary" : "outline"}`} onClick={() => setFileType(null)}>Text</Button>
@@ -286,7 +301,7 @@ export default function PdfUploader() {
                     </div>
                 )}
 
-                <div className="flex justify-between gap-2">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                     <div className="flex-1">
                         <Textarea
                             className="min-h-[400px] scroll-auto"
@@ -298,7 +313,7 @@ export default function PdfUploader() {
                                     : mode === "needsRange"
                                         ? "Pick a page range ≤ 10, then extract"
                                         : "Edit extracted text here"
-                                : fileType === "txt" ? "Upload Text file to extract text" : "Put your text here directly..."
+                                    : fileType === "txt" ? "Upload Text file to extract text" : "Put your text here directly..."
                             }
                         />
                     </div>

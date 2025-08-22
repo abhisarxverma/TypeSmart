@@ -28,6 +28,9 @@
     border-radius: 10px;
     height: 40px;
     font-family: "Inter", "Sans-serif";
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .searchBar > input:hover, .searchBar > input:focus {
@@ -51,6 +54,9 @@
 .addFileButton {
     grid-column: 2/3;
     grid-row: 2/-1;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
 }
 
 @media (min-width: 35rem) {

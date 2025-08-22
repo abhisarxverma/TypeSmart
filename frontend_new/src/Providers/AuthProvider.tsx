@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import supabase from "../lib/supabaseClient.ts";
-import { AuthContext } from '../Hooks/useAuth.tsx';
+import supabase from "@/lib/supabaseClient.ts"
+import { AuthContext } from '@/Hooks/useAuth.tsx';
 import api from '../lib/axios.ts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getRealUser } from '@/lib/queries.tsx';
@@ -16,6 +16,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["user"],
     queryFn: getRealUser,
     staleTime: Infinity,
+    gcTime: Infinity,
     enabled: !!token,
     retry: false,
   })
