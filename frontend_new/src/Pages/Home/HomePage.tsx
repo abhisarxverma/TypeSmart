@@ -1,35 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/Hooks/useAuth"
-import api from "@/lib/axios";
+import clsx from "clsx";
+import styles from "./HomePage.module.css";
 
 export default function HomePage() {
 
-    const { user, signOut } = useAuth();
-
-    async function test() {
-        try {
-            const res = await api.get("/user/add_in_group");
-            const data = res.data;
-
-            console.log("Test result : ", data);
-
-            if (data.error) {
-                console.log("Error in testing : ", data.error);
-                return null;
-            }
-
-            return data
-        } catch (error) {
-            console.log("Error in Testing : ", error);
-            return null;
-        }
-    }
-
     return (
-        <>
-            <h1>Welcome {user?.full_name ?? "User"}</h1>
-            <Button onClick={signOut}>Logout</Button>
-            <Button onClick={test}>Test adding</Button>
-        </>
+        <h1 className={clsx(styles.title)}>Homepage</h1>
     )
 }

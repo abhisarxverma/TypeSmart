@@ -6,6 +6,8 @@ import { ThemeProvider } from './Providers/ThemeProvider.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AuthProvider from './Providers/AuthProvider.tsx'
 import { BrowserRouter } from 'react-router-dom'
+import TypingTextProvider from './Providers/TypingTextProvider.tsx'
+import LibraryProvider from './Providers/LibraryProvider.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +23,11 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <App />
+            <TypingTextProvider>
+              <LibraryProvider>
+                <App />
+              </LibraryProvider>
+            </TypingTextProvider>
           </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>

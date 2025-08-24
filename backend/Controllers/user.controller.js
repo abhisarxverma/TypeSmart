@@ -1,13 +1,11 @@
 
-export const uploadFile = async (req, res) => {
+export const uploadText = async (req, res) => {
     const sb = req.sb;
     const user = req.user;
 
     try {
 
-        const { title, text, subject, group_id, importance } = req.body;
-
-        console.log("Folder id : ", folder_id)
+        const { title, text, subject, importance } = req.body;
 
         if (!title || !text || !subject) {
             return res.json({ error: "Incomplete details provided to upload file" })
@@ -28,34 +26,10 @@ export const uploadFile = async (req, res) => {
             return res.status(500).json({ error: "Unexpected server error" });
         }
 
-        if (group_id){
-            const { data: group, error: groupFindError } = await sb
-                .from("groups")
-                .select("*")
-                .eq("group_id", group_id).single();
-
-            if (groupFindError) {
-                console.log("Error in finding group : ", groupFindError);
-                return res.status(500).json({ error : "Unexpected Internal Server Error" });
-            }
-
-            const { data: GroupTextRow, error: GroupTextError } = await sb
-            .from("group_texts")
-            .insert({
-                text_id: insertedText.id,
-                group_id: group_id
-            });
-
-            if (GroupTextError) {
-                console.log("Error in adding in group : ", GroupTextError);
-                return res.status(500).json({ error : "Unexpected Internal Server Error" });
-            }
-        }
-
         return res.status(200).json(insertedText)
 
     } catch (error) {
-        console.log("Error in upload file controller : ", error);
+        console.log("Error in upload text controller : ", error);
         return res.stats(500).json({ error: "Unexpected server error " });
     }
 }
@@ -65,37 +39,34 @@ export const getLibrary = async (req, res) => {
     const user = req.user;
 
     try {
-        // Fetch folders with their files using a left join
-        const { data: foldersWithFiles, error: foldersWithFilesError } = await sb
-            .from("folders")
+
+        const { data: allTexts, error: textsError } = await sb
+            .from('texts')
+            .select('*')
+
+        if (textsError) throw textsError
+
+        // console.log("All texts result : ", allTexts);
+
+        const { data: groupsWithTexts, error: groupsError } = await sb
+            .from("groups")
             .select(`
     *,
-    files:files (
-      *
+    group_texts:group_texts (
+      texts (*)
     )
   `);
 
-        if (foldersWithFilesError) {
-            console.log("Error fetching folders with files:", foldersWithFilesError);
-            return res.status(500).json({ error: "Unexpected server error" });
-        }
+        if (groupsError) throw groupsError;
 
-        // Fetch files that are not in any folder
-        const { data: freeFiles, error: freeFilesError } = await sb
-            .from("files")
-            .select("*")
-            .is("folder_id", null);
+        const flattenedGroups = groupsWithTexts.map(group => ({ ...group, group_texts: group.group_texts.map(g => g.texts) }))
 
-        if (freeFilesError) {
-            console.log("Error fetching free files:", freeFilesError);
-            return res.status(500).json({ error: "Unexpected server error" });
-        }
+        // console.log("Groups with texts result : ", flattenedGroups);
 
-        // Final response
         return res.status(200).json({
-            folders: foldersWithFiles,
-            files: freeFiles
-        });
+            "groups": flattenedGroups,
+            "texts": allTexts
+        })
 
     } catch (error) {
         console.log("Error occured in get library controller : ", error);
@@ -103,32 +74,132 @@ export const getLibrary = async (req, res) => {
     }
 }
 
-export const createFolder = async (req, res) => {
+export const createGroup = async (req, res) => {
     const sb = req.sb;
     const user = req.user;
 
     try {
 
-        const { name } = req.body;
+        const { name, subject } = req.body;
         if (!name) {
             return res.status(300).json({ error: "Please provide the folder name" })
         }
-        const { data: createdFolder, error } = await sb
-            .from("folders")
+        const { data: createdGroup, error } = await sb
+            .from("groups")
             .insert({
                 user_id: user.id,
-                name: name
+                name: name,
+                subject: subject
             }).select("*").single();
 
         if (error) {
-            console.log("Error in create folder supabase request : ", error);
-            return res.status(500).json({ error: "Unexpected Server Error" });
+            throw error
         }
 
-        return res.status(200).json(createdFolder)
+        return res.status(200).json(createdGroup)
 
     } catch (error) {
-        console.log("Error in create folder controller : ", error);
+        console.log("Error in create group controller : ", error);
         return res.status(500).json({ error: "Unexptected server error" });
+    }
+}
+
+export const addInGroup = async (req, res) => {
+    const sb = req.sb;
+    const user = req.user;
+
+    try {
+
+        const { text_id, group_id } = req.body;
+
+        if (!text_id || !group_id) {
+            return res.status(300).json({ error: "Missing data in request" });
+        }
+
+        const { data: text, error: textFindError } = await sb
+            .from("texts")
+            .select("*")
+            .eq("id", text_id)
+            .single()
+
+        if (textFindError) throw textFindError;
+
+        const { data: group, error: groupFindError } = await sb
+            .from("groups")
+            .select("*")
+            .eq("id", group_id)
+            .single()
+
+        if (groupFindError) throw groupFindError;
+
+        console.log("Find group result : ", group)
+
+        const { data: GroupTextRow, error: GroupTextError } = await sb
+            .from("group_texts")
+            .insert({
+                text_id: text.id,
+                group_id: group.id
+            });
+
+        if (GroupTextError) throw GroupTextError;
+
+        // console.log("Group insertion result : ", GroupTextRow);
+
+        return res.status(200).json(text);
+
+    } catch (error) {
+        console.log("Error occured in add in group controller : ", error);
+        return res.status(500).json({ error: "Unexpected server error" });
+    }
+}
+
+export const removeFromGroup = async (req, res) => {
+    const sb = req.sb;
+    const user = req.user;
+
+    try {
+
+        const { text_id, group_id } = req.body;
+
+        if (!text_id || !group_id) {
+            return res.status(300).json({ error: "Missing data in request" });
+        }
+
+        const { data: text, error: textFindError } = await sb
+            .from("texts")
+            .select("*")
+            .eq("id", text_id)
+            .single()
+
+        if (textFindError) throw textFindError;
+
+        const { data: group, error: groupFindError } = await sb
+            .from("groups")
+            .select("*")
+            .eq("id", group_id)
+            .single()
+
+        if (groupFindError) throw groupFindError;
+
+        console.log("Find group result : ", group)
+
+        const { data: removedText, error: removeError  } = await sb
+            .from("group_texts")
+            .delete()
+            .match({
+                text_id: text.id,
+                group_id: group.id
+            });
+
+
+        if (removeError) throw removeError;
+
+        // console.log("Group deletion result : ", removedText);
+
+        return res.status(200).json(text);
+
+    } catch (error) {
+        console.log("Error occured in remove from group controller : ", error);
+        return res.status(500).json({ error: "Unexpected server error" });
     }
 }

@@ -1,0 +1,12 @@
+.textBox {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.character {
+    font-size: var(--fs-h2);
+}
+
+.typed {
+    font-weight: var(--fw-semibold);
+}

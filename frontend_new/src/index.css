@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  font-family: "Nata Sans", "sans-serif";
+  background: linear-gradient(135deg, var(--bg-gradient-1), var(--color-background));
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -44,6 +49,7 @@
 :root {
   /* Typography Scale */
   --ff-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ff-nata: "Nata Sans", "sans-serif";
 
   /* Headings */
   --fs-h1: clamp(2rem, 1.5rem + 1vw, 3rem);   /* Page titles / Hero */
@@ -151,6 +157,15 @@
   
   --accent: #3b82f6; /* TypeFreaks logo text blue */
   --accent-foreground: #ffffff;
+
+  --accent-hover: #518ef1;
+
+  --tab-active-bg: rgb(224,231,255);
+  --tab-active-fc: rgb(110,104,216);
+
+  --bg-gradient-1: rgb(241,244,255);
+
+  --fc-label: rgb(109,117,128);
   
   /* Buttons & Status */
   --success: #22c55e; /* green (Random Practice button) */

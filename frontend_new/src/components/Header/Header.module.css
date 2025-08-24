@@ -1,0 +1,28 @@
+
+.title {
+    font-size: var(--fs-h2);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.tabs {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: var(--fs-button-lg);
+}
+
+.tab {
+    background-color: var(--background);
+    color: var(--foreground);
+    padding: .5rem 1rem;
+    border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+.active, .tab:hover, .tab:focus {
+    background-color: var(--tab-active-bg);
+    color: var(--tab-active-fc);
+}

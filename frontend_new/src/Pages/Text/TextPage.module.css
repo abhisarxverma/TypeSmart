@@ -1,0 +1,12 @@
+
+.container {
+    max-width: 1100px;
+    margin-inline: auto;
+}
+
+.pageTitle {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    display: flex;
+    align-items: center;
+}

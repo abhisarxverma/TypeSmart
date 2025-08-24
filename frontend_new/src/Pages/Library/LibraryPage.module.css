@@ -1,0 +1,66 @@
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+}
+
+.pageTitle {
+    font-size: var(--fs-h2);
+    font-weight: 599;
+}
+
+.addTextButton {
+    background-color: var(--accent);
+}
+
+.addTextButton:hover, .addTextButton:focus {
+    background-color: var(--accent-hover);
+}
+
+.sectionTitle {
+    margin-block-start: 1rem;
+}
+
+.filtersBox {
+    max-width: 700px;
+    margin-block-start: 1rem;
+    background-color: white;
+    border-radius: .5rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.filtersBox > div {
+    flex: 1;
+}
+
+.searchBar {
+    border: .5px solid var(--foreground);
+    border-radius: .5rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.inputGroup > label {
+    color: var(--fc-label);
+    font-size: .8rem;
+    font-weight: var(--fw-semibold);
+}
+
+.groupsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.groupsBox, .textsBox {
+    margin-block-start: 2rem;
+}
