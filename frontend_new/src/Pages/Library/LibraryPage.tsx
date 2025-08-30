@@ -24,44 +24,44 @@ export default function LibraryPage() {
     const subjects = getSubjects(library?.texts ?? [])
 
     return (
-        <>
-            <div className={clsx(styles.container)}>
-                <h1 className={clsx(styles.pageTitle)}>Your Library</h1>
-                <div className="flex items-center gap-1">
-                    <CreateFolderDialogWrapper><Button className={clsx(styles.createGroupButton)}><PiFilesThin />Create Group</Button></CreateFolderDialogWrapper>
-                    <Button className={clsx(styles.addTextButton)} asChild>
+        <div className="max-w-[1100px] mx-auto pb-8">
+            <div className="flex items-center justify-between">
+                <h1 className="text-xl md:text-3xl font-semibold">Your Library</h1>
+                <div className="flex items-center gap-2">
+                    <CreateFolderDialogWrapper><Button ><PiFilesThin />Create Group</Button></CreateFolderDialogWrapper>
+                    <Button variant="outline" asChild>
                         <Link to="/add"><CiTextAlignLeft />Add Text</Link>
                     </Button>
                 </div>
             </div>
-            <div className={clsx(styles.filtersBox, "shadow")}>
+            <div className="flex items-center mt-8 gap-2">
                 <div className={clsx(styles.inputGroup)}>
-                    <label>Search</label>
+                    {/* <label>Search</label> */}
                     <div className={clsx(styles.searchBar)}>
                         <Input name="search" placeholder="Search your library...." />
                     </div>
                 </div>
                 <div className={clsx(styles.inputGroup)}>
-                    <label>Subject</label>
-                    <CustomSelect label="Filter by subject" setValue={setSubject} options={subjects} />
+                    {/* <label>Subject</label> */}
+                    <CustomSelect label="Subject" setValue={setSubject} options={subjects} />
                 </div>
                 <div className={clsx(styles.inputGroup)}>
-                    <label>Importance</label>
-                    <CustomSelect label="Filter by Importance" setValue={setImportance} options={getImportances()} />
+                    {/* <label>Importance</label> */}
+                    <CustomSelect label="Importance" setValue={setImportance} options={getImportances()} />
                 </div>
             </div>
-            <div className={clsx(styles.groupsBox)}>
-                <p className={clsx(styles.sectionTitle, "mb-2")}>Your Groups</p>
-                <div className={clsx(styles.groupsList)}>
+            <div className="mt-8">
+                <p className="text-xl font-semibold mb-2">Groups</p>
+                <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
                     {library?.groups?.map(group => (
                         <GroupCard key={group.id} group={group} />
                     ))}
                 </div>
             </div>
-            <div className={clsx(styles.textsBox)}>
-                <p className={clsx(styles.sectionTitle, "mb-2")}>Your All Texts</p>
-                <TextsList groupId={null} texts={library?.texts ?? []} type={"library_all_texts"} />
+            <div className="mt-8">
+                <p className="text-xl font-semibold mb-2">All Texts</p>
+                <TextsList groupId={null} texts={library?.texts ?? []} />
             </div>
-        </>
+        </div>
     )
 }

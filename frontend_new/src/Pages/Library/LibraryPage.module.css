@@ -11,14 +11,6 @@
     font-weight: 599;
 }
 
-.addTextButton {
-    background-color: var(--accent);
-}
-
-.addTextButton:hover, .addTextButton:focus {
-    background-color: var(--accent-hover);
-}
-
 .sectionTitle {
     margin-block-start: 1rem;
 }
@@ -53,14 +45,4 @@
     color: var(--fc-label);
     font-size: .8rem;
     font-weight: var(--fw-semibold);
-}
-
-.groupsList {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.groupsBox, .textsBox {
-    margin-block-start: 2rem;
 }

@@ -3,21 +3,23 @@ import styles from "./TextCard.module.css";
 import type { Text } from "@/lib/Types/Library";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { AiOutlineDelete } from "react-icons/ai";
-import { Loader } from "lucide-react";
+import { IoOpenOutline } from "react-icons/io5";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useNavigate } from "react-router-dom";
+import TextDialog from "../TextDialog/TextDialog";
+import { useState } from "react";
 
 interface TextCardProps {
-    type: "add_in_group" | "present_in_group" | "library_all_texts";
     text: Text;
     groupId: string | null
 }
 
-export default function TextCard({ text, type, groupId }: TextCardProps) {
+export default function TextCard({ text, groupId }: TextCardProps) {
 
     const navigate = useNavigate();
+
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
     const queryClient = useQueryClient();
 
@@ -51,19 +53,18 @@ export default function TextCard({ text, type, groupId }: TextCardProps) {
     };
 
     return (
-        <div onClick={() => navigate(`/library/text/${text?.id}`)} className={clsx(styles.card, "shadow cursor-pointer")}>
-            <div className={clsx(styles.textGroup)}>
-                <p>{text.title}</p>
-                <div className={styles.badges}>
-                    <Badge variant="secondary">{text.subject}</Badge>
-                    <Badge variant="outline">{text.importance}</Badge>
+        <>
+            <TextDialog open={dialogOpen} setOpen={setDialogOpen} text={text} />
+            <div onClick={() => setDialogOpen(true)} className={clsx(styles.card, "shadow cursor-pointer")}>
+                <div className={clsx(styles.textGroup)}>
+                    <p>{text.title}</p>
+                    <div className={styles.badges}>
+                        <Badge variant="secondary">{text.subject}</Badge>
+                        <Badge variant="outline">{text.importance}</Badge>
+                    </div>
                 </div>
+                <Button variant="secondary"><IoOpenOutline /></Button>
             </div>
-            <div className={clsx(styles.buttons)}>
-                {type === "add_in_group" && <Button title="Add text in this group" variant="outline" onClick={() => addInGroup()} disabled={isAdding}>{isAdding ? <Loader className="animate-spin" /> : "Add"}</Button>}
-                {(type === "present_in_group" || type === "library_all_texts") && <Button title="Start typing this text" onClick={practiceText}>Type</Button>}
-                {type === "present_in_group" && <Button title="Remove text from this group" variant={"outline"} className="hover:bg-background" onClick={() => removeFromGroup()} disabled={isRemoving}>{isRemoving ? <Loader className="text-red-500 animate-spin" /> : <AiOutlineDelete className="text-red-500" />}</Button>}
-            </div>
-        </div>
+        </>
     );
 }

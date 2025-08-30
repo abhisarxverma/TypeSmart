@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type CustomSelectProps = {
   label: string;
@@ -16,30 +16,25 @@ type CustomSelectProps = {
 };
 
 export default function CustomSelect({ label, options, setValue }: CustomSelectProps) {
-  const [selected, setSelected] = useState<string>("all");
-
-  // On mount, set default to null (meaning "All")
-  useEffect(() => {
-    setValue(null);
-  }, [setValue]);
+  const [selected, setSelected] = useState<string>("");
 
   return (
     <Select
       value={selected}
       onValueChange={(val) => {
         setSelected(val);
-        setValue(val === "all" ? null : val);
+        setValue(val === "__placeholder__" ? null : val);
       }}
     >
-      <SelectTrigger className="w-full border-1 border-[var(--fc-label)]">
-        <SelectValue />
+      <SelectTrigger className="w-full min-w-[150px] border border-[var(--fc-label)]">
+        <SelectValue placeholder={"Filter by "+label} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>{label}</SelectLabel>
 
-          {/* Default "All" option */}
-          <SelectItem value="all">All</SelectItem>
+          {/* Placeholder option with null value */}
+          <SelectItem value="__placeholder__">{"All "+label}</SelectItem>
 
           {/* Dynamic options */}
           {options.map((opt) => (

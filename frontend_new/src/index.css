@@ -142,20 +142,20 @@ body {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   /* Base */
-  --background: #ffffff;
-  --foreground: #0f172a; /* dark slate for text */
+  /* --background: #ffffff;
+  --foreground: #0f172a;  */
   
   /* Accent / Branding */
-  --primary: #8b5cf6; /* Purple (Create Group button) */
+  /* --primary: #8b5cf6; 
   --primary-foreground: #ffffff;
   
-  --secondary: #f1f5f9; /* light gray background (cards) */
+  --secondary: #f1f5f9; 
   --secondary-foreground: #0f172a;
   
-  --muted: #e2e8f0; /* subtle gray */
+  --muted: #e2e8f0; 
   --muted-foreground: #64748b;
   
-  --accent: #3b82f6; /* TypeFreaks logo text blue */
+  --accent: #3b82f6; 
   --accent-foreground: #ffffff;
 
   --accent-hover: #518ef1;
@@ -165,19 +165,19 @@ body {
 
   --bg-gradient-1: rgb(241,244,255);
 
-  --fc-label: rgb(109,117,128);
+  --fc-label: rgb(109,117,128); */
   
   /* Buttons & Status */
-  --success: #22c55e; /* green (Random Practice button) */
-  --warning: #facc15; /* yellow (medium tag) */
-  --danger: #ef4444;  /* red (delete trash icon) */
+  /* --success: #22c55e; 
+  --warning: #facc15; 
+  --danger: #ef4444;   */
   
   /* Borders & Inputs */
-  --border: #e5e7eb;
-  --input: #f9fafb;
+  /* --border: #e5e7eb;
+  --input: #f9fafb; */
   
   /* Radius */
-  --radius: 0.75rem;
+  /* --radius: 0.75rem; */
 }
 
 .dark {
