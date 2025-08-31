@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import supabase from "../lib/supabaseClient.ts";
-import { AuthContext } from '../Hooks/useAuth.tsx';
+import { AuthContext } from '@/Hooks/useAuth.tsx';
 import api from '../lib/axios.ts';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getRealUser } from '@/lib/queries.tsx';
@@ -16,11 +16,12 @@ function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["user"],
     queryFn: getRealUser,
     staleTime: Infinity,
+    gcTime: 1000 * 60 * 60 * 24, 
     enabled: !!token,
     retry: false,
   })
 
-  // console.log("USER : ", user)
+  console.log("USER : ", user)
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({

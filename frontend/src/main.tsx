@@ -2,12 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import { BrowserRouter } from "react-router-dom";
-import AuthProvider from './Contexts/AuthProvider.tsx'
+import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ThemeProvider } from './Contexts/Theme/ThemeProvider.tsx';
-import TypingTextProvider from './Contexts/TypingTextProvider.tsx';
-import LibraryProvider from './Contexts/LibraryProvider.tsx';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import AuthProvider from './Contexts/AuthProvider.tsx'
+import LibraryProvider from './Contexts/LibraryProvider.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,19 +17,20 @@ const queryClient = new QueryClient({
   },
 })   
 
+persistQueryClient({
+  queryClient,
+  persister: createAsyncStoragePersister({ storage: window.localStorage }),
+});
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter >
       <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <AuthProvider>
-              <TypingTextProvider>
-                <LibraryProvider>
-                    <App />
-                </LibraryProvider>
-              </TypingTextProvider>
-            </AuthProvider>
-          </ThemeProvider>
+        <AuthProvider>
+          <LibraryProvider>
+              <App />
+          </LibraryProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </StrictMode>,

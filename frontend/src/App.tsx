@@ -1,37 +1,41 @@
-import { Toaster } from "react-hot-toast";
-import { useAuth } from "./Hooks/useAuth";
+import MainApp from "./apps/MainApp";
 import { Route, Routes } from "react-router-dom";
-import { LuLoaderCircle } from "react-icons/lu";
-import HomePage from "./Pages/HomePage";
-import AuthPage from "./Pages/AuthPage";
-import { ProtectedRoute, CheckIsAuthed } from "./utils/protection";
-import Layout from "./components/Layout";
-import LibraryPage from "./Pages/LibraryPage";
-import PdfUploader from "./Pages/New_upload/AddNewFile";
+import Library from "./pages/main/Library";
+import { useAuth } from "./Hooks/useAuth";
+import { LucideLoaderCircle } from "lucide-react";
+import { ProtectedRoute } from "./utils/protection";
+import AuthPage from "./pages/auth/AuthPage";
+import DemoApp from "./apps/DemoApp";
 
-function App() {
+export default function App() {
 
   const { hasCheckedAuth, isGettingUser } = useAuth();
 
   if (!hasCheckedAuth || isGettingUser) return (
     <div className="h-screen flex items-center justify-center">
-      <LuLoaderCircle className="animate-spin text-black text-5xl" />
+      <LucideLoaderCircle className="animate-spin text-5xl" />
     </div>
   )
 
   return (
-    <>
-      <Toaster />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-          <Route path="/login-signup" element={<CheckIsAuthed><AuthPage /></CheckIsAuthed>} />
-          <Route path="/library/:folderName/add-new" element={<PdfUploader />} />
-          <Route path="/library/:folderName" element={<LibraryPage />} />
-        </Routes>
-      </Layout>
-    </>
+    <Routes>
+      <Route path="/app" element={
+        <ProtectedRoute>
+          <MainApp />
+        </ProtectedRoute>
+      }>
+        <Route path="library" element={
+          <Library />
+        } />
+      </Route>
+
+      <Route path="/demo" element={<DemoApp />}>
+        <Route path="library" element={
+          <Library />
+        } />
+      </Route>
+
+      <Route path="/login-signup" element={<AuthPage />} />
+    </Routes>
   )
 }
-
-export default App;

@@ -1,6 +1,5 @@
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-
 import { cn } from "@/lib/utils"
 
 function Tabs({
@@ -24,7 +23,8 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
+        // container line
+        "inline-flex items-center gap-6 border-b border-[var(--border)]",
         className
       )}
       {...props}
@@ -40,7 +40,15 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // base text styles
+        "text-sm font-medium text-[var(--muted-foreground)] px-1 pb-2 -mb-px border-b-2 border-transparent",
+        // active state
+        "data-[state=active]:text-[var(--foreground)] data-[state=active]:border-[var(--foreground)]",
+        // hover
+        "hover:text-[var(--foreground)] transition-colors",
+        // focus
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+        "disabled:opacity-50 disabled:pointer-events-none",
         className
       )}
       {...props}
@@ -55,7 +63,7 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      className={cn("mt-0", className)}
       {...props}
     />
   )

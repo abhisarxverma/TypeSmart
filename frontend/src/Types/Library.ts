@@ -1,22 +1,23 @@
 export interface Library {
-    files: File[] | null
-    folders: Folder[] | null
+    texts: Text[]
+    groups: Group[]
 }
 
-export interface File {
+export interface Text {
     id: string
     user_id: string,
-    folder_id: string
     times_typed: number,
     text: string,
     title: string
-    subject: string
+    tag: string
     uploaded_at: string
 }
 
-export interface Folder {
+export interface Group {
     id: string
     name: string
     user_id: string
-    files: File[] | null
+    tag: string
+    group_texts: Text[]
+    created_at: string
 }

@@ -3,7 +3,7 @@ import api from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import type React from "react";
 
-export default function LibraryProvider({ children } : {children: React.ReactNode}) {
+export default function LibraryProvider({ children } : {children: React.ReactNode }) {
 
     const { data: library, isLoading: isFetchingLibrary } = useQuery({
         queryKey: ["library"],
@@ -19,7 +19,9 @@ export default function LibraryProvider({ children } : {children: React.ReactNod
                 throw new Error(error?.response?.data?.error ?? "Failed to fetch library");
             }
         },
-        staleTime: Infinity
+        staleTime: Infinity,
+        gcTime: 1000 * 60 * 60 * 24,
+
     })
 
     return (

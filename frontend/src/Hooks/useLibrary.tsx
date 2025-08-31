@@ -11,7 +11,7 @@ export const LibraryContext = createContext<LibraryContextType | null>(null);
 export const useLibrary = () => {
     const ctx = useContext(LibraryContext);
     if (!ctx) {
-        throw new Error("Current folder context must be used LibraryProvider.")
+        throw new Error("Library context must be used LibraryProvider.")
     }
     return ctx ;
 }
