@@ -5,6 +5,7 @@ import TextsList from "@/components/library/TextsList";
 import GroupsList from "@/components/library/GroupsList";
 import { useLibrary } from "@/Hooks/useLibrary";
 import { Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Library() {
 
@@ -25,7 +26,11 @@ export default function Library() {
             <div className="flex items-center justify-between">
                 <h1 className="text-heading">Library</h1>
                 <div className="flex items-center">
-                    <Button variant="ghost"><FaPlus /><span className="font-semibold">New group</span></Button>
+                    <Button variant="ghost" asChild>
+                        <Link to="/app/add-text">
+                            <FaPlus /><span className="font-semibold">New group</span>
+                        </Link>
+                    </Button>
                     <Button variant="ghost"><FaPlus /><span className="font-semibold">New text</span></Button>
                 </div>
             </div>

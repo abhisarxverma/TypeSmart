@@ -6,16 +6,16 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-export default function CustomSelect() {
+export default function CustomSelect({ options }:{ options: string[] }) {
     return (
         <Select>
-            <SelectTrigger className="bg-secondary my-0 py-0">
-                <SelectValue placeholder="Theme" />
+            <SelectTrigger className="">
+                <SelectValue placeholder="Select Importance" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
+                {options.map(option => (
+                    <SelectItem value={option}>{option.toUpperCase()}</SelectItem>
+                ))}
             </SelectContent>
         </Select>
     )

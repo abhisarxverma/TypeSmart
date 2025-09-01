@@ -9,7 +9,7 @@ export default function SearchBar() {
             <Input
                 type="text"
                 placeholder="Search your library"
-                className="ps-10 w-full border-0" 
+                className="ps-10 w-full border-0 bg-secondary" 
             />
         </div>
     )

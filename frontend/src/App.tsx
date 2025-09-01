@@ -6,6 +6,7 @@ import { LucideLoaderCircle } from "lucide-react";
 import { ProtectedRoute } from "./utils/protection";
 import AuthPage from "./pages/auth/AuthPage";
 import DemoApp from "./apps/DemoApp";
+import AddText from "./pages/main/AddText";
 
 export default function App() {
 
@@ -24,10 +25,10 @@ export default function App() {
           <MainApp />
         </ProtectedRoute>
       }>
-        <Route path="library" element={
-          <Library />
-        } />
+        <Route path="library" element={<Library />} />
+        <Route path="add-text" element={<AddText />} />
       </Route>
+
 
       <Route path="/demo" element={<DemoApp />}>
         <Route path="library" element={
