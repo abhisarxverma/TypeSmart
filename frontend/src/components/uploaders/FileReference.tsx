@@ -10,16 +10,21 @@ import { MdOutlineFileUpload, MdClose } from "react-icons/md";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 type Mode = "idle" | "ready";
+type FileType = "pdf" | "txt" | null;
 
-export default function PdfUploader({
-    text,
+export default function FileReference({
+  text,
   textSettingFn,
+  addClass,
 }: {
-    text: string,
+  text: string;
   textSettingFn: React.Dispatch<React.SetStateAction<string>>;
+  addClass: string;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<FileType>(null);
+
   const [numPages, setNumPages] = useState<number | null>(null);
   const [rangeStart, setRangeStart] = useState<number>(1);
   const [rangeEnd, setRangeEnd] = useState<number>(1);
@@ -35,28 +40,38 @@ export default function PdfUploader({
     };
   }, [fileUrl]);
 
-  const handlePdfFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
 
     if (fileUrl) URL.revokeObjectURL(fileUrl);
 
-    const nextUrl = URL.createObjectURL(f);
+    const ext = f.name.split(".").pop()?.toLowerCase();
+    if (ext !== "pdf" && ext !== "txt") {
+      toast.error("Only PDF and TXT files are supported");
+      return;
+    }
+
     setFile(f);
+    setFileType(ext as FileType);
+
+    const nextUrl = URL.createObjectURL(f);
     setFileUrl(nextUrl);
 
     try {
-      const data = await f.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data }).promise;
-      pdfDocRef.current = pdf;
-      setNumPages(pdf.numPages);
-      setRangeStart(1);
-      setRangeEnd(Math.min(20, pdf.numPages));
-      setMode("ready");
+      if (ext === "pdf") {
+        const data = await f.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        pdfDocRef.current = pdf;
+        setNumPages(pdf.numPages);
+        setRangeStart(1);
+        setRangeEnd(Math.min(20, pdf.numPages));
+        setMode("ready");
+      } else if (ext === "txt") {
+        setMode("ready");
+      }
     } catch (err) {
-      toast.error("Failed to read PDF");
+      toast.error("Failed to read file");
       console.error(err);
       setMode("idle");
     } finally {
@@ -64,7 +79,7 @@ export default function PdfUploader({
     }
   };
 
-  const extractRange = async (start: number, end: number) => {
+  const extractPdfRange = async (start: number, end: number) => {
     const pdf = pdfDocRef.current;
     if (!pdf) return;
 
@@ -73,7 +88,7 @@ export default function PdfUploader({
       return;
     }
     if (end - start + 1 > 20) {
-      toast.error("Please select up to 10 pages");
+      toast.error("Please select up to 20 pages");
       return;
     }
 
@@ -98,9 +113,25 @@ export default function PdfUploader({
     }
   };
 
+  const extractTextFile = async () => {
+    if (!file) return;
+    setIsExtracting(true);
+    try {
+      const content = await file.text();
+      const clean = normalizeForTyping(content);
+      textSettingFn((prev) => prev + clean);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to read text file");
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   const resetUpload = () => {
     setFile(null);
     setFileUrl(null);
+    setFileType(null);
     setNumPages(null);
     setMode("idle");
     pdfDocRef.current = null;
@@ -108,15 +139,17 @@ export default function PdfUploader({
   };
 
   return (
-    <section className="space-y-4">
+    <section className={"space-y-4 " + addClass}>
       {!fileUrl && (
         <div
-          className="w-full h-full flex flex-col gap-2 items-center justify-center border-2 border-secondary bg-card-secondary border-dashed rounded-md p-6 py-10"
+          className="w-full h-full flex flex-col gap-3 items-center justify-center border-2 border-secondary bg-card-secondary border-dashed rounded-md p-6 py-10"
           onClick={() => inputRef.current?.click()}
         >
           <MdOutlineFileUpload className="text-[3rem] text-muted-foreground w-15 h-auto p-2 aspect-square bg-secondary rounded-full" />
-          <p className="font-semibold">Upload a PDF</p>
-          <p className="text-muted-foreground text-sm">Upload a PDF to extract text</p>
+          <p className="font-semibold">Open File for Reference</p>
+          <p className="text-muted-foreground text-sm">
+            You can upload any file and add text from it
+          </p>
           <Button variant="secondary" className="mt-4">
             Select file
           </Button>
@@ -124,8 +157,8 @@ export default function PdfUploader({
             type="file"
             name="file"
             ref={inputRef}
-            accept=".pdf"
-            onChange={handlePdfFileChange}
+            accept=".pdf,.txt"
+            onChange={handleFileChange}
             className="hidden"
           />
         </div>
@@ -134,11 +167,19 @@ export default function PdfUploader({
       {fileUrl && (
         <div className="space-y-4">
           <div className="relative">
-            <iframe
-              src={fileUrl}
-              className="w-full h-[400px] md:h-[90vh] border rounded"
-              title="PDF preview"
-            />
+            {fileType === "pdf" ? (
+              <iframe
+                src={fileUrl}
+                className="w-full h-[400px] md:h-[90vh] border rounded"
+                title="PDF preview"
+              />
+            ) : (
+              <iframe
+                src={fileUrl}
+                className="w-full h-[400px] md:h-[90vh] border rounded bg-card"
+                title="Text file preview"
+              />
+            )}
             <button
               onClick={resetUpload}
               className="absolute top-2 right-2 bg-secondary p-1 rounded-full hover:bg-muted"
@@ -147,7 +188,7 @@ export default function PdfUploader({
             </button>
           </div>
 
-          {mode === "ready" && (
+          {mode === "ready" && fileType === "pdf" && (
             <div className="grid grid-cols-3 gap-2 items-end">
               <div className="self-start col-start-1 col-end-2">
                 <label className="block text-sm mb-1">Start page</label>
@@ -178,14 +219,39 @@ export default function PdfUploader({
               </div>
               <div className="self-center col-start-3 col-end-4">
                 <Button
-                  onClick={() => extractRange(rangeStart, rangeEnd)}
+                  onClick={() => extractPdfRange(rangeStart, rangeEnd)}
                   disabled={isExtracting}
                   className="w-full"
                   variant="secondary"
                 >
-                  {text==="" ? (isExtracting ? "Extracting..." : "Extract text") : (isExtracting ? "Adding..." : "Add text")}
+                  {text === ""
+                    ? isExtracting
+                      ? "Extracting..."
+                      : "Extract text"
+                    : isExtracting
+                    ? "Adding..."
+                    : "Add text"}
                 </Button>
               </div>
+            </div>
+          )}
+
+          {mode === "ready" && fileType === "txt" && (
+            <div className="flex justify-end mt-auto">
+              <Button
+                onClick={extractTextFile}
+                disabled={isExtracting}
+                className="w-full sm:w-auto"
+                variant="secondary"
+              >
+                {text === ""
+                  ? isExtracting
+                    ? "Extracting..."
+                    : "Extract text"
+                  : isExtracting
+                  ? "Adding..."
+                  : "Add text"}
+              </Button>
             </div>
           )}
         </div>

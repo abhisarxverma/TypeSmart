@@ -2,8 +2,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import supabase from "../lib/supabaseClient.ts";
 import { AuthContext } from '@/Hooks/useAuth.tsx';
 import api from '../lib/axios.ts';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getRealUser } from '@/lib/queries.tsx';
+import { useQueryClient } from '@tanstack/react-query';
+import { useGetRealUserQuery } from '@/Hooks/useBackend.tsx';
 
 function AuthProvider({ children }: { children: ReactNode }) {
 
@@ -12,16 +12,9 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading: isGettingUser, refetch } = useQuery({
-    queryKey: ["user"],
-    queryFn: getRealUser,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 60 * 24, 
-    enabled: !!token,
-    retry: false,
-  })
+  const { user, isGettingUser, refetch } = useGetRealUserQuery(token);
 
-  console.log("USER : ", user)
+  // console.log("USER : ", user)
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({

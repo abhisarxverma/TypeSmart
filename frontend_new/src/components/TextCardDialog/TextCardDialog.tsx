@@ -17,7 +17,7 @@ export default function TextCardDialog({ text, type }: TextCardDialogProps) {
     const [open, setOpen] = useState<boolean>(false);
 
     return (
-        <div className="flex items-center border-1 border-black rounded p-2 transition-all duration-150 hover:mx-2">
+        <div className="flex items-center border-1 border-black rounded p-2">
             <TextDialog text={text} open={open} setOpen={setOpen} />
             <div className="flex-1 flex flex-col gap-1">
                 <span className="text-md">{text.title}</span>

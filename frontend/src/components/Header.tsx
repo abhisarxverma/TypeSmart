@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 
@@ -10,7 +11,9 @@ export default function Header() {
             </div>
             <nav className="flex items-center gap-1">
                 <Button variant="ghost">Type</Button>
-                <Button variant="ghost">Library</Button>
+                <Button variant="ghost" asChild>
+                    <Link to="/app/library">Library</Link>
+                </Button>
                 <Button variant="ghost">Settings</Button>
                 <Avatar className="ms-2">
                     <AvatarImage className="" src="https://github.com/shadcn.png" />

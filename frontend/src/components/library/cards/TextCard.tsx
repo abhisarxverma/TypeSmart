@@ -3,10 +3,16 @@ import type { Text } from "@/Types/Library";
 import { countWords, timeAgo } from "@/utils/text";
 import { FaHashtag } from "react-icons/fa";
 import { memo } from "react";
+import { useNavigate } from "react-router-dom";
+import { giveTextDetailsRoute } from "@/utils/routing";
 
 function TextCard({ text } : { text : Text }) {
+
+    const navigate = useNavigate();
+    const detailsRoute = giveTextDetailsRoute(text.id);
+
     return (
-        <div className="relative min-h-[145px] p-5 rounded-lg border-1 border-border bg-card flex flex-col justify-between transition-all duration-300 hover:bg-secondary">
+        <div onClick={() => navigate(detailsRoute)} className="relative cursor-pointer min-h-[145px] p-5 rounded-lg border-1 border-border bg-card flex flex-col justify-between transition-all duration-300 hover:bg-secondary">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                     <p className="font-semibold">{text.title}</p>

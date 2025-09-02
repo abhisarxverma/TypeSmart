@@ -48,6 +48,7 @@ img {
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-base: var(--base);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card-secondary: var(--card-secondary);
@@ -189,6 +190,8 @@ img {
   --accent: #2d3748;              /* subtle hover background */
   --accent-foreground: #f9fafb;
 
+  --base : rgb(164, 176, 191);
+
   --destructive: #dc2626;         /* error red */
   --destructive-foreground: #ffffff;
 
@@ -218,6 +221,14 @@ img {
 @layer components {
   .text-heading {
     @apply text-3xl font-semibold;
+  }
+
+  .text-heading-lg {
+    @apply text-4xl font-semibold;
+  }
+
+  .text-subheading-lg {
+    @apply text-muted-foreground text-[1rem];
   }
 
   .text-subheading {

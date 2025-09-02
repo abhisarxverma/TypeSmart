@@ -12,7 +12,7 @@ export const getRealUser = async () => {
 }
 
 export const addTextInGroup = async(groupId: string | null, textId: string) => {
-    const res = await api.post("/user/add_in_group", {
+    const res = await api.post("/library/add_in_group", {
         group_id: groupId,
         text_id : textId
     });
@@ -23,7 +23,7 @@ export const addTextInGroup = async(groupId: string | null, textId: string) => {
 }
 
 export const addText = async ( title: string, text: string, tag: string ) => {
-    const res = await api.post("/user/add_text", {
+    const res = await api.post("/library/add_text", {
         title,
         text,
         tag

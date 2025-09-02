@@ -5,9 +5,9 @@ export const uploadText = async (req, res) => {
 
     try {
 
-        const { title, text, subject, importance } = req.body;
+        const { title, text, tag } = req.body;
 
-        if (!title || !text || !subject) {
+        if (!title || !text || !tag) {
             return res.json({ error: "Incomplete details provided to upload file" })
         }
 
@@ -17,8 +17,7 @@ export const uploadText = async (req, res) => {
                 user_id: user.id,
                 title: title,
                 text: text,
-                subject: subject,
-                importance: importance
+                tag: tag,
             }).select("*").single();
 
         if (error) {
@@ -89,7 +88,7 @@ export const createGroup = async (req, res) => {
             .insert({
                 user_id: user.id,
                 name: name,
-                subject: subject
+                tag: tag
             }).select("*").single();
 
         if (error) {
@@ -183,7 +182,7 @@ export const removeFromGroup = async (req, res) => {
 
         console.log("Find group result : ", group)
 
-        const { data: removedText, error: removeError  } = await sb
+        const { data: removedText, error: removeError } = await sb
             .from("group_texts")
             .delete()
             .match({
@@ -201,5 +200,39 @@ export const removeFromGroup = async (req, res) => {
     } catch (error) {
         console.log("Error occured in remove from group controller : ", error);
         return res.status(500).json({ error: "Unexpected server error" });
+    }
+}
+
+export const editText = async (req, res) => {
+    const sb = req.sb;
+
+    try {
+        const { title, text, tag, textId } = req.body;
+
+        if (!title || !text || !tag || !textId) {
+            return res.json({ error: "Incomplete details provided to upload file" })
+        }
+
+        const { data: updatedText, error } = await sb
+            .from("texts")
+            .update({
+                title: title,
+                text: text,
+                tag: tag,
+            })
+            .eq("id", textId)
+            .select("*")
+            .single();
+
+
+        if (error) {
+            throw error;
+        }
+
+        return res.status(200).json(updatedText)
+
+    } catch (error) {
+        console.log("Error in upload text controller : ", error);
+        return res.stats(500).json({ error: "Unexpected server error " });
     }
 }

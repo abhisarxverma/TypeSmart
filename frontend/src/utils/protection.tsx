@@ -2,7 +2,10 @@ import { useAuth } from "@/Hooks/useAuth";
 import { Navigate } from "react-router-dom";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, isGettingUser } = useAuth();
+  if (isGettingUser) return (
+    { children }
+  )
   return user ? children : <Navigate to="/login-signup" />;
 }
 

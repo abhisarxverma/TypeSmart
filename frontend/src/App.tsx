@@ -7,12 +7,14 @@ import { ProtectedRoute } from "./utils/protection";
 import AuthPage from "./pages/auth/AuthPage";
 import DemoApp from "./apps/DemoApp";
 import AddText from "./pages/main/AddText";
+import TextDetails from "./pages/main/TextDetails";
+import EditText from "./pages/main/EditText";
 
 export default function App() {
 
   const { hasCheckedAuth, isGettingUser } = useAuth();
 
-  if (!hasCheckedAuth || isGettingUser) return (
+  if (isGettingUser) return (
     <div className="h-screen flex items-center justify-center">
       <LucideLoaderCircle className="animate-spin text-5xl" />
     </div>
@@ -27,6 +29,8 @@ export default function App() {
       }>
         <Route path="library" element={<Library />} />
         <Route path="add-text" element={<AddText />} />
+        <Route path="library/text/:id" element={<TextDetails />} />
+        <Route path="library/edit-text/:id" element={<EditText />} />
       </Route>
 
 
@@ -37,6 +41,8 @@ export default function App() {
       </Route>
 
       <Route path="/login-signup" element={<AuthPage />} />
+
+
     </Routes>
   )
 }
