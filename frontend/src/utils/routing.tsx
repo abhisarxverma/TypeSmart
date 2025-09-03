@@ -18,3 +18,7 @@ export function giveTextDetailsRoute(textId: string) {
 export function giveAuthRoute() {
     return "/login-signup";
 }
+
+export function giveGroupDetailsRoute( groupId: string ) {
+    return "/app/library/group/"+groupId
+}

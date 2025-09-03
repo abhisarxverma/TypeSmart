@@ -18,6 +18,16 @@ export interface Group {
     name: string
     user_id: string
     tag: string
-    group_texts: Text[]
+    group_texts: TextInGroup[]
     created_at: string
+}
+
+export interface TextInGroup {
+    id: string
+    title: string
+    text: string
+    uploaded_at: string
+    tag: string
+    times_typed: number
+    importance: string
 }

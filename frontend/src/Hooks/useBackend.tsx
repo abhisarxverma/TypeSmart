@@ -1,4 +1,5 @@
 import api from "@/lib/axios";
+import type { Library } from "@/Types/Library";
 import { giveLibraryRoute, giveTextDetailsRoute } from "@/utils/routing";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -111,4 +112,53 @@ export function useEditTextMutation({ text, title, tag, textId }: { text: string
     });
 
     return { editText, isEditingText };
+}
+
+export function useUpdateImportanceMutation({ textId, groupId, importance }: { textId: string, groupId: string, importance: string }) {
+
+    const queryClient = useQueryClient();
+
+    const { mutate: updateImportance, isPending: isUpdatingImportance } = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/library/update_importance", {
+                textId, groupId, importance
+            });
+
+            const data = res.data;
+            console.log("Update importance result : ", data);
+
+            if (data.error) throw new Error(data.error);
+
+            return data;
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        },
+        onSuccess: (data) => {
+            const library: Library | undefined = queryClient.getQueryData(["library"]);
+
+            if (!library) return;
+
+            const newGroups = library.groups.map(group => {
+                if (group.id === groupId) return {
+                    ...group,
+                    group_texts: group.group_texts.map(text => {
+                        if (text.id === data.id) {
+                            return {
+                                ...text,
+                                importance: data.importance,
+                            };
+                        }
+                        return text;
+                    })
+                }
+                else return group;
+            });
+
+            queryClient.setQueryData(["library"], {texts: library.texts, groups: newGroups});
+        }
+
+    })
+
+    return { updateImportance, isUpdatingImportance };
 }

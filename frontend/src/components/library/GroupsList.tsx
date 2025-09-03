@@ -9,7 +9,7 @@ export default function GroupsList({ groups } : { groups : Group[] }) {
         <>
             <SearchBar />
             {groups.length <= 0 ? <EmptyList category="groups" /> : (
-                <ListLayout>
+                <ListLayout addClass="mt-5">
                     {groups.map(group => (<GroupCard group={group} key={group.id} />))}
                 </ListLayout>
             )}

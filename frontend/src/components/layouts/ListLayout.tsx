@@ -1,8 +1,8 @@
 import type React from "react";
 
-export default function ListLayout({ children } : { children : React.ReactNode }) {
+export default function ListLayout({ children, addClass="" } : { children : React.ReactNode, addClass: string }) {
     return (
-        <div className="grid grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] gap-5 mt-5">
+        <div className={"grid grid-cols-[repeat(auto-fill,_minmax(220px,_1fr))] gap-5 "+addClass}>
             { children }
         </div>
     )

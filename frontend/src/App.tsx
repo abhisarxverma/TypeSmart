@@ -9,6 +9,7 @@ import DemoApp from "./apps/DemoApp";
 import AddText from "./pages/main/AddText";
 import TextDetails from "./pages/main/TextDetails";
 import EditText from "./pages/main/EditText";
+import GroupDetails from "./pages/main/GroupDetails";
 
 export default function App() {
 
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="add-text" element={<AddText />} />
         <Route path="library/text/:id" element={<TextDetails />} />
         <Route path="library/edit-text/:id" element={<EditText />} />
+        <Route path="library/group/:id" element={<GroupDetails />} />
       </Route>
 
 

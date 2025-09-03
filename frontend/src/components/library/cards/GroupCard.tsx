@@ -3,10 +3,16 @@ import { timeAgo } from "@/utils/text";
 import { memo } from "react";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { FaHashtag, FaLayerGroup } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
+import { giveGroupDetailsRoute } from "@/utils/routing";
 
 function GroupCard({ group }: { group: Group }) {
+
+    const navigate = useNavigate();
+    const groupDetailsRoute = giveGroupDetailsRoute(group.id);
+
     return (
-        <div className="relative min-h-[145px] p-5 rounded-lg border-1 border-border bg-card flex flex-col justify-between transition-all duration-300 hover:bg-secondary">
+        <div onClick={() => navigate(groupDetailsRoute)} className="relative min-h-[145px] p-5 rounded-lg border-1 border-border bg-card flex flex-col justify-between transition-all duration-300 hover:bg-secondary">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                     <p className="font-semibold">{group.name}</p>

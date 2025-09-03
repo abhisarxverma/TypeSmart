@@ -6,6 +6,8 @@ export default function LibraryProvider({ children } : {children: React.ReactNod
 
     const { library, isFetchingLibrary } = useGetLibraryQuery();
 
+    console.log("Library : ", library);
+
     return (
         <LibraryContext.Provider value={{ library, isFetchingLibrary }}>
             {children}

@@ -52,13 +52,21 @@ export const getLibrary = async (req, res) => {
             .select(`
     *,
     group_texts:group_texts (
+      importance,
       texts (*)
     )
   `);
 
+
         if (groupsError) throw groupsError;
 
-        const flattenedGroups = groupsWithTexts.map(group => ({ ...group, group_texts: group.group_texts.map(g => g.texts) }))
+        const flattenedGroups = groupsWithTexts.map(group => ({
+            ...group,
+            group_texts: group.group_texts.map(g => ({
+                ...g.texts,
+                importance: g.importance
+            }))
+        }));
 
         // console.log("Groups with texts result : ", flattenedGroups);
 
@@ -236,3 +244,43 @@ export const editText = async (req, res) => {
         return res.stats(500).json({ error: "Unexpected server error " });
     }
 }
+
+export const updateImportance = async (req, res) => {
+  const sb = req.sb;
+
+  try {
+    const { textId, groupId, importance } = req.body;
+
+    if (!textId || !groupId || !importance) {
+      return res.status(400).json({ error: "Incomplete request made" });
+    }
+
+    const { data: updatedJoinRow, error: updateError } = await sb
+      .from("group_texts")
+      .update({ importance })
+      .eq("text_id", textId)
+      .eq("group_id", groupId)
+      .select("importance")
+      .single();
+
+    if (updateError) throw updateError;
+
+    const { data: textRow, error: textError } = await sb
+      .from("texts")
+      .select("*")
+      .eq("id", textId)
+      .single();
+
+    if (textError) throw textError;
+
+    const enrichedText = {
+      ...textRow,
+      importance: updatedJoinRow.importance,
+    };
+
+    return res.status(200).json(enrichedText);
+  } catch (error) {
+    console.error("Error in updateImportance controller:", error);
+    return res.status(500).json({ error: "Unexpected server error" });
+  }
+};

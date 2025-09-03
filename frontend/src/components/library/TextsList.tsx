@@ -16,7 +16,7 @@ export default function TextsList({ texts } : { texts : Text[] }) {
         <>
             <SearchBar />
             {texts.length <= 0 ? <EmptyList category="texts" /> : (
-                <ListLayout>
+                <ListLayout addClass="mt-5">
                     {renderedTexts}
                 </ListLayout>
             )}
