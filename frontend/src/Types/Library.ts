@@ -11,6 +11,7 @@ export interface Text {
     title: string
     tag: string
     uploaded_at: string
+    importance: null;
 }
 
 export interface Group {

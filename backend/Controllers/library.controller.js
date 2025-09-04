@@ -112,6 +112,7 @@ export const createGroup = async (req, res) => {
 }
 
 export const addInGroup = async (req, res) => {
+
     const sb = req.sb;
     const user = req.user;
 
@@ -135,11 +136,21 @@ export const addInGroup = async (req, res) => {
             .from("groups")
             .select("*")
             .eq("id", group_id)
-            .single()
+            .single();
 
+        // console.log("Find group result : ", group)
+            
         if (groupFindError) throw groupFindError;
 
-        console.log("Find group result : ", group)
+        const { data: alreadyExist, error: alreadyExistError } = await sb
+        .from("group_texts")
+        .select("*")
+        .eq("text_id", text_id)
+        .eq("group_id", group_id)
+
+        if (alreadyExistError) throw alreadyExistError;
+
+        if (alreadyExist.length > 0) return res.status(400).json({ error : "Text already present in the group" });
 
         const { data: GroupTextRow, error: GroupTextError } = await sb
             .from("group_texts")
@@ -152,7 +163,7 @@ export const addInGroup = async (req, res) => {
 
         // console.log("Group insertion result : ", GroupTextRow);
 
-        return res.status(200).json(text);
+        return res.status(200).json({...text, importance: "medium"});;
 
     } catch (error) {
         console.log("Error occured in add in group controller : ", error);
@@ -162,7 +173,6 @@ export const addInGroup = async (req, res) => {
 
 export const removeFromGroup = async (req, res) => {
     const sb = req.sb;
-    const user = req.user;
 
     try {
 
@@ -188,7 +198,17 @@ export const removeFromGroup = async (req, res) => {
 
         if (groupFindError) throw groupFindError;
 
-        console.log("Find group result : ", group)
+        // console.log("Find group result : ", group)
+
+        const { data: notPresent, error: presenceError } = await sb
+            .from("group_texts")
+            .select("*")
+            .eq("text_id", text_id)
+            .eq("group_id", group_id)
+        
+        if (presenceError) throw presenceError;
+
+        if ( notPresent.length <= 0 ) return res.status(400).json({ error: "Text not present in group" });
 
         const { data: removedText, error: removeError } = await sb
             .from("group_texts")

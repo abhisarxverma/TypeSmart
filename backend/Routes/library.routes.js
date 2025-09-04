@@ -14,7 +14,7 @@ router.post("/create_group", requireAuth, createGroup)
 
 router.post("/add_in_group", requireAuth, addInGroup)
 
-router.post("/remove_from_group", requireAuth, removeFromGroup)
+router.delete("/remove_from_group", requireAuth, removeFromGroup)
 
 router.post("/update_importance", requireAuth, updateImportance)
 

@@ -155,10 +155,100 @@ export function useUpdateImportanceMutation({ textId, groupId, importance }: { t
                 else return group;
             });
 
-            queryClient.setQueryData(["library"], {texts: library.texts, groups: newGroups});
+            queryClient.setQueryData(["library"], { texts: library.texts, groups: newGroups });
         }
 
     })
 
     return { updateImportance, isUpdatingImportance };
+}
+
+export function useAddTextInGroupMutation({ textId, groupId }: { textId: string, groupId: string }) {
+
+    const queryClient = useQueryClient();
+
+    const { mutate: addTextInGroup, isPending: isAddingInGroup } = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/library/add_in_group", {
+                text_id: textId,
+                group_id: groupId
+            });
+
+            const data = res.data;
+
+            console.log("Add in group mutation result : ", data);
+
+            if (data.error) throw new Error(data.error);
+
+            return data;
+        },
+        onError: (error) => {
+            toast.error(error.message);
+            console.log("Error in add in group mutation: ", error);
+        },
+        onSuccess: (text) => {
+
+            const library = queryClient.getQueryData<Library>(["library"]);
+            if (!library) return;
+
+            const newGroups = library.groups.map(grp =>
+                grp.id === groupId
+                    ? { ...grp, group_texts: [...grp.group_texts, text] }
+                    : grp
+            );
+
+            queryClient.setQueryData<Library>(["library"], {
+                ...library,
+                groups: newGroups,
+            });
+
+        }
+    });
+
+    return { addTextInGroup, isAddingInGroup };
+
+}
+
+export function useRemoveTextFromGroupMutation({ textId, groupId }: { textId: string, groupId: string }) {
+
+    const queryClient = useQueryClient();
+
+    const { mutate: removeFromGroup, isPending: isRemovingFromGroup } = useMutation({
+        mutationFn: async () => {
+            const res = await api.delete("/library/remove_from_group", {
+                data: { text_id: textId, group_id: groupId }
+            });
+
+            const data = res.data;
+
+            console.log("Remove from group mutation result : ", data);
+
+            if (data.error) throw new Error(data.error);
+            
+            return data;
+
+        },
+        onError: (error) => {
+            toast.error(error.message);
+            console.log("Error in remove from group mutation : ", error);
+        },
+        onSuccess: (text) => {
+            const library = queryClient.getQueryData<Library>(["library"]);
+            if (!library) return;
+
+            const newGroups = library.groups.map(grp =>
+                grp.id === groupId
+                    ? { ...grp, group_texts: grp.group_texts.filter(txt => txt.id !== text.id) }
+                    : grp
+            );
+
+            queryClient.setQueryData<Library>(["library"], {
+                ...library,
+                groups: newGroups,
+            });
+        }
+    });
+
+    return { removeFromGroup, isRemovingFromGroup };
+
 }

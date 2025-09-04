@@ -4,10 +4,11 @@ import LoaderPage from "../utils/LoaderPage";
 import NotFound from "../utils/NotFound";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FaKeyboard, FaPlus } from "react-icons/fa6";
+import { FaKeyboard } from "react-icons/fa6";
 import NoTexts from "@/components/library/GroupDetails/NoTexts";
 import TextPresentCard from "@/components/library/GroupDetails/TextPresentCard";
 import ListLayout from "@/components/layouts/ListLayout";
+import AddTextDialog from "@/components/library/GroupDetails/AddTextDialog/AddTextDialog";
 
 export default function GroupDetails() {
 
@@ -25,12 +26,12 @@ export default function GroupDetails() {
         <>
             <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                    <h1 className="text-heading-lg font-bold mb-2">{group.name}</h1>
+                    <h1 className="text-heading font-bold mb-2">{group.name}</h1>
                     <Badge className="text-[.9rem]" variant="secondary"># {group.tag}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button><FaKeyboard /> Start Typing</Button>
-                    <Button variant="ghost"><FaPlus /> Add text</Button>
+                    <Button variant="secondary"><FaKeyboard /> Type</Button>
+                    <AddTextDialog group={group} />
                 </div>
             </div>
             <div className="flex flex-col mt-10 gap-2">
@@ -40,7 +41,7 @@ export default function GroupDetails() {
                         <NoTexts />
                     ) : (
                         <ListLayout>
-                            {group.group_texts.map((text) => (<TextPresentCard text={text} groupId={group.id} />))}
+                            {group.group_texts.map((text) => (<TextPresentCard text={text} groupId={group.id} id={text.id} />))}
                         </ListLayout>
                     )}
                 </div>
