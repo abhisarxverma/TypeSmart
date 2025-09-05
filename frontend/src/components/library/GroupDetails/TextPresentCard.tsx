@@ -5,11 +5,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { TextInGroup } from "@/Types/Library";
 import { FaHashtag, FaPencil } from "react-icons/fa6";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { giveEditTextRoute, giveTextDetailsRoute } from "@/utils/routing";
@@ -40,7 +38,7 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
     const textDetailsRoute = giveTextDetailsRoute(text.id);
     const editDetailsRoute = giveEditTextRoute(text.id);
 
-    function handleImportanceChange(value) {
+    function handleImportanceChange(value:string) {
         if (isUpdatingImportance) return;
         setImportance(value);
         updateImportance()

@@ -1,5 +1,5 @@
 import SearchBar from "../SearchBar";
-import EmptyList from "./EmptyList";
+import EmptyList from "./TextDetails/EmptyList";
 import type { Group } from "@/Types/Library";
 import ListLayout from "../layouts/ListLayout";
 import GroupCard from "./cards/GroupCard";

@@ -53,6 +53,7 @@ export const getLibrary = async (req, res) => {
     *,
     group_texts:group_texts (
       importance,
+      added_at,
       texts (*)
     )
   `);
@@ -64,7 +65,8 @@ export const getLibrary = async (req, res) => {
             ...group,
             group_texts: group.group_texts.map(g => ({
                 ...g.texts,
-                importance: g.importance
+                importance: g.importance,
+                added_at: g.added_at
             }))
         }));
 
@@ -87,7 +89,7 @@ export const createGroup = async (req, res) => {
 
     try {
 
-        const { name, subject } = req.body;
+        const { name, tag } = req.body;
         if (!name) {
             return res.status(300).json({ error: "Please provide the folder name" })
         }

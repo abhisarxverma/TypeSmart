@@ -1,5 +1,5 @@
 import SearchBar from "../SearchBar";
-import EmptyList from "./EmptyList";
+import EmptyList from "./TextDetails/EmptyList";
 import type { Text } from "@/Types/Library";
 import TextCard from "./cards/TextCard";
 import ListLayout from "../layouts/ListLayout";
@@ -14,7 +14,7 @@ export default function TextsList({ texts } : { texts : Text[] }) {
 
     return (
         <>
-            <SearchBar />
+            <SearchBar placeHolder="Search groups...." />
             {texts.length <= 0 ? <EmptyList category="texts" /> : (
                 <ListLayout addClass="mt-5">
                     {renderedTexts}

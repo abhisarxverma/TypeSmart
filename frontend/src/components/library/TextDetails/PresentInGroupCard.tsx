@@ -1,0 +1,32 @@
+import { Button } from "@/components/ui/button";
+import type { Group } from "@/Types/Library";
+import { giveGroupDetailsRoute } from "@/utils/routing";
+import { FaHashtag } from "react-icons/fa6";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
+import { RiArrowRightSLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+
+export default function PresentInGroupCard({ group }: { group: Group }) {
+    
+    const navigate = useNavigate();
+    const groupDetailsRoute = giveGroupDetailsRoute(group.id);
+
+    return (
+        <div className="bg-card-dark hover:bg-card transition-all duration-300 border-1 border-border rounded-md p-4 flex flex-col gap-2 cursor-pointer">
+            <div className="flex justify-between items-start gap-2">
+                <div className="flex flex-col gap-1 ">
+                    <p className="font-semibold">{group.name}</p>
+                    <div className="flex items-center text-muted-foreground text-[.8rem] gap-1">
+                        <FaHashtag />
+                        <span className="">{group.tag}</span>
+                    </div>
+                </div>
+                <RiArrowRightSLine className="text-[1.5rem]" onClick={() => navigate(groupDetailsRoute)} />
+            </div>
+            <div className="flex gap-2 justify-end mt-auto">
+                <Button title="Remove from this group" variant="ghost" className="text-destructive"><IoIosRemoveCircleOutline /></Button>
+            </div>
+        </div>
+    )
+
+}

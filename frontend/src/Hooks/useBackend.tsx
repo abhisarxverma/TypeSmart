@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
-import type { Library } from "@/Types/Library";
-import { giveLibraryRoute, giveTextDetailsRoute } from "@/utils/routing";
+import type { Group, Library } from "@/Types/Library";
+import { giveGroupDetailsRoute, giveLibraryRoute, giveTextDetailsRoute } from "@/utils/routing";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -224,7 +224,7 @@ export function useRemoveTextFromGroupMutation({ textId, groupId }: { textId: st
             console.log("Remove from group mutation result : ", data);
 
             if (data.error) throw new Error(data.error);
-            
+
             return data;
 
         },
@@ -250,5 +250,37 @@ export function useRemoveTextFromGroupMutation({ textId, groupId }: { textId: st
     });
 
     return { removeFromGroup, isRemovingFromGroup };
+
+}
+
+export function useCreateGroupMutation({ name, tag }: { name: string, tag: string }) {
+
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+
+    const { mutate: createGroup, isPending: isCreatingGroup } = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/library/create_group", {
+                name,
+                tag
+            });
+            const data = res.data;
+            console.log("Create group mutation result : ", data);
+            if (data.error) throw new Error(data.error);
+            return data;
+        },
+        onSuccess: (data: Group) => {
+            const group = data;
+            group.group_texts = [];
+
+            queryClient.setQueryData(["library"], (old: Library) => ({
+                ...old,
+                groups: [...(old?.groups || []), group]
+            }));
+            navigate(giveGroupDetailsRoute(data.id));
+        }
+    });
+
+    return { createGroup, isCreatingGroup };
 
 }

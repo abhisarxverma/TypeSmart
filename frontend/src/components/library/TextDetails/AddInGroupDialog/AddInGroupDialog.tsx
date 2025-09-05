@@ -7,26 +7,28 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import AddTextCard from "./AddTextCard"
+import AddInGroupCard from "./AddInGroupCard"
 import SearchBar from "@/components/SearchBar"
 import { useLibrary } from "@/Hooks/useLibrary"
-import type { Group, TextInGroup } from "@/Types/Library"
+import type { Group, Text } from "@/Types/Library"
+import LoaderPage from "@/pages/utils/LoaderPage"
 
-export default function AddTextDialog({
-  group,
+export default function AddInGroupDialog({
+  text,
+  presentInGroups,
   children
 }: {
-  group: Group
+  text: Text
+  presentInGroups: Group[]
   children: React.ReactNode
 }) {
   const { library, isFetchingLibrary } = useLibrary()
 
-  if (isFetchingLibrary) return null
+  if (isFetchingLibrary) return <LoaderPage />
 
-  const existingIds = new Set(group.group_texts.map(t => t.id));
+  const presentInGroupsIds = new Set(presentInGroups.map(grp => grp.id));
 
-  const canAddTexts = library.texts.filter(txt => !existingIds.has(txt.id));
-
+  const canAddInGroups = library.groups.filter(grp => !presentInGroupsIds.has(grp.id));
 
   return (
     <Dialog>
@@ -37,7 +39,7 @@ export default function AddTextDialog({
         <DialogHeader className="border-b-2 border-border pb-5">
           <DialogTitle>Add text in group</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            {group.name}
+            {text.title}
           </DialogDescription>
         </DialogHeader>
 
@@ -45,13 +47,13 @@ export default function AddTextDialog({
 
         <ScrollArea className="h-[300px] pr-2">
           <div className="space-y-2">
-            {canAddTexts.length > 0 ? (
-              canAddTexts.map((txt) => (
-                <AddTextCard key={txt.id} text={txt as unknown as TextInGroup} groupId={group.id} />
+            {canAddInGroups.length > 0 ? (
+              canAddInGroups.map((grp) => (
+                <AddInGroupCard key={grp.id} group={grp as unknown as Group} textId={text.id} />
               ))
             ) : (
               <p className="text-sm text-muted-foreground px-2">
-                No texts available to add.
+                No groups available to add.
               </p>
             )}
           </div>

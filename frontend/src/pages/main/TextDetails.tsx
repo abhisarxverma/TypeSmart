@@ -7,6 +7,8 @@ import { Link, useParams } from "react-router-dom"
 import { RiDeleteBinLine } from "react-icons/ri";
 import { giveEditTextRoute } from "@/utils/routing";
 import { FaRegKeyboard } from "react-icons/fa";
+import { getPresentInGroups } from "@/utils/files";
+import PresentInGroups from "@/components/library/TextDetails/PresentInGroups";
 
 
 export default function TextDetails() {
@@ -32,6 +34,8 @@ export default function TextDetails() {
 
     const editDetailsRoute = giveEditTextRoute(textId);
 
+    const presentInGroups = getPresentInGroups(text.id, library.groups);
+
     return (
         <>
             <div className="flex items-center justify-between">
@@ -55,6 +59,8 @@ export default function TextDetails() {
                     {text.text}
                 </p>
             </div>
+
+            <PresentInGroups text={text} groups={presentInGroups} />
 
         </>
     )

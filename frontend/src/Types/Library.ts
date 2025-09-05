@@ -31,4 +31,5 @@ export interface TextInGroup {
     tag: string
     times_typed: number
     importance: string
+    added_at: string
 }

@@ -12,7 +12,7 @@ function GroupCard({ group }: { group: Group }) {
     const groupDetailsRoute = giveGroupDetailsRoute(group.id);
 
     return (
-        <div onClick={() => navigate(groupDetailsRoute)} className="relative min-h-[145px] p-5 rounded-lg border-1 border-border bg-card flex flex-col justify-between transition-all duration-300 hover:bg-secondary">
+        <div onClick={() => navigate(groupDetailsRoute)} className="relative min-h-[145px] p-5 rounded-lg border-1 border-border bg-card-dark flex flex-col justify-between transition-all duration-300 hover:bg-card">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                     <p className="font-semibold">{group.name}</p>
@@ -25,7 +25,7 @@ function GroupCard({ group }: { group: Group }) {
             </div>
             <div className="text-muted-foreground pt-2 text-[.7rem] border-t-2 border-secondary flex items-center justify-between">
                 <p className="text-[.8rem] flex items-center gap-1"><FaLayerGroup /><span>{group.group_texts.length ?? 0} texts</span></p>
-                <p className="">{timeAgo(group.created_at)}</p>
+                <p>{timeAgo(group.created_at)}</p>
             </div>
         </div>
     )

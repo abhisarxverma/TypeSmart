@@ -12,7 +12,7 @@ function TextCard({ text } : { text : Text }) {
     const detailsRoute = giveTextDetailsRoute(text.id);
 
     return (
-        <div onClick={() => navigate(detailsRoute)} className="relative cursor-pointer min-h-[145px] p-5 rounded-lg border-1 border-border bg-card flex flex-col justify-between transition-all duration-300 hover:bg-secondary">
+        <div onClick={() => navigate(detailsRoute)} className="relative cursor-pointer min-h-[145px] p-5 rounded-lg border-1 border-border bg-card-dark flex flex-col justify-between transition-all duration-300 hover:bg-card">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                     <p className="font-semibold">{text.title}</p>
