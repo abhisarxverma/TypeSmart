@@ -1,4 +1,3 @@
-import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import type { Text } from "@/Types/Library";
 import { countWords, timeAgo } from "@/utils/text";
 import { FaHashtag } from "react-icons/fa";
@@ -16,14 +15,13 @@ function TextCard({ text } : { text : Text }) {
             <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                     <p className="font-semibold">{text.title}</p>
-                    <PiDotsThreeVerticalBold />
                 </div>
                 <div className="flex items-center text-muted-foreground text-[.8rem] gap-1">
                     <FaHashtag />
                     <span className="">{text.tag}</span>
                 </div>
             </div>
-            <div className="text-muted-foreground pt-2 text-[.7rem] border-t-2 border-secondary flex items-center justify-between">
+            <div className="text-muted-foreground pt-2 mt-5 text-[.7rem] border-t-2 border-secondary flex items-center justify-between">
                 <p className="text-[.8rem]">{countWords(text.text)} Words</p>
                 <p className="">{timeAgo(text.uploaded_at)}</p>
             </div>

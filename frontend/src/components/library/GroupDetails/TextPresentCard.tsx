@@ -50,16 +50,15 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
     }
 
     return (
-        <div className="bg-card-dark hover:bg-card transition-all duration-300 border-1 border-border rounded-md p-4 flex flex-col gap-2 cursor-pointer">
+        <div  className="bg-card-dark hover:bg-card transition-all duration-300 border-1 border-border rounded-md p-4 flex flex-col gap-2 cursor-pointer">
             <div className="flex justify-between items-start gap-2">
                 <div className="flex flex-col gap-1 ">
-                    <p className="font-semibold">{text.title}</p>
+                    <p onClick={() => navigate(textDetailsRoute)} className="font-semibold">{text.title}</p>
                     <div className="flex items-center text-muted-foreground text-[.8rem] gap-1">
                         <FaHashtag />
                         <span className="">{text.tag}</span>
                     </div>
                 </div>
-                <RiArrowRightSLine className="text-[1.5rem]" onClick={() => navigate(textDetailsRoute)} />
             </div>
             <div className="grid grid-cols-[auto_1fr] gap-1 items-center mt-auto">
                 <span className="text-muted-foreground text-[.8rem]">Importance : </span>
@@ -76,7 +75,7 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
             </div>
             <div className="flex gap-2 justify-end mt-auto">
                 <Button onClick={() => navigate(editDetailsRoute)} variant="ghost" className=""><FaPencil /></Button>
-                <Button onClick={handleRemove} variant="ghost" className="text-destructive">{isRemovingFromGroup ? <Loader2 className="animate-spin text-red-500" /> : <IoIosRemoveCircleOutline />}</Button>
+                <Button onClick={handleRemove} variant="ghost" className="text-destructive hover:text-destructive">{isRemovingFromGroup ? <Loader2 className="animate-spin text-red-500" /> : <IoIosRemoveCircleOutline />}</Button>
             </div>
         </div>
     )

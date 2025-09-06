@@ -10,7 +10,7 @@ export default function NoGroups({text}:{text:Text}) {
             <AddInGroupDialog presentInGroups={[]} text={text}>
                 <Button variant="ghost" className="text-xl font-semibold text-muted-foreground h-full w-full">
                     <FaPlus />
-                    Add in group
+                    Add in first group
                 </Button>
             </AddInGroupDialog>
         </div>

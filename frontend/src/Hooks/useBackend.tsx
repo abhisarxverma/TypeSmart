@@ -275,12 +275,71 @@ export function useCreateGroupMutation({ name, tag }: { name: string, tag: strin
 
             queryClient.setQueryData(["library"], (old: Library) => ({
                 ...old,
-                groups: [...(old?.groups || []), group]
+                groups: [group, ...(old?.groups || [])]
             }));
             navigate(giveGroupDetailsRoute(data.id));
         }
     });
 
     return { createGroup, isCreatingGroup };
+
+}
+
+export function useDeleteTextMutation( textId : string ) {
+
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const libraryRoute = giveLibraryRoute();
+
+    const { mutate: deleteText, isPending: isDeletingText } = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/library/delete_text", {
+                textId
+            });
+            const data = res.data;
+            console.log("Delete text result : ", data);
+            if (data.error) throw new Error(data.error);
+            return data;
+        },
+        onError: (error) => {
+            console.log("Error in delete text mutation : ", error);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["library"] });
+            navigate(libraryRoute);
+        }
+    });
+
+    return { deleteText, isDeletingText };
+
+}
+
+export function useDeleteGroupMutation( groupId : string ) {
+
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const libraryRoute = giveLibraryRoute();
+
+    const { mutate: deleteGroup, isPending: isDeletingGroup } = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/library/delete_group", {
+                groupId
+            });
+            const data = res.data;
+            console.log("Delete group result : ", data);
+            if (data.error) throw new Error(data.error);
+            return data;
+        },
+        onError: (error) => {
+            console.log("Error in delete group mutation : ", {groupId, error});
+            toast.error(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["library"] });
+            navigate(libraryRoute);
+        }
+    });
+
+    return { deleteGroup, isDeletingGroup };
 
 }

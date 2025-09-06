@@ -12,6 +12,9 @@ import SearchBar from "@/components/SearchBar"
 import { useLibrary } from "@/Hooks/useLibrary"
 import type { Group, Text } from "@/Types/Library"
 import LoaderPage from "@/pages/utils/LoaderPage"
+import { useState } from "react"
+import { useSearch } from "@/Hooks/useSearch"
+import { PiEmpty } from "react-icons/pi"
 
 export default function AddInGroupDialog({
   text,
@@ -23,12 +26,14 @@ export default function AddInGroupDialog({
   children: React.ReactNode
 }) {
   const { library, isFetchingLibrary } = useLibrary()
-
-  if (isFetchingLibrary) return <LoaderPage />
+  const [ searchQuery, setSearchQuery ] = useState<string>("");
 
   const presentInGroupsIds = new Set(presentInGroups.map(grp => grp.id));
-
   const canAddInGroups = library.groups.filter(grp => !presentInGroupsIds.has(grp.id));
+
+  const queriedCanAddGroups = useSearch(canAddInGroups, searchQuery, ["name", "tag"]);
+  
+  if (isFetchingLibrary) return <LoaderPage />
 
   return (
     <Dialog>
@@ -43,18 +48,21 @@ export default function AddInGroupDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <SearchBar addClass="" placeHolder="Search texts...." />
+        <SearchBar querySetterFn={setSearchQuery} placeHolder="Search groups to add...." />
 
         <ScrollArea className="h-[300px] pr-2">
           <div className="space-y-2">
-            {canAddInGroups.length > 0 ? (
-              canAddInGroups.map((grp) => (
+            {queriedCanAddGroups.length > 0 ? (
+              queriedCanAddGroups.map((grp) => (
                 <AddInGroupCard key={grp.id} group={grp as unknown as Group} textId={text.id} />
               ))
             ) : (
-              <p className="text-sm text-muted-foreground px-2">
-                No groups available to add.
-              </p>
+              <div className="h-full flex flex-col items-center justify-center gap-2 py-10">
+                <PiEmpty className="text-3xl text-muted-foreground" />
+                <p className="text-sm text-muted-foreground px-2">
+                  No groups found.
+                </p>
+              </div>
             )}
           </div>
         </ScrollArea>

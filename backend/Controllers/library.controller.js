@@ -42,6 +42,7 @@ export const getLibrary = async (req, res) => {
         const { data: allTexts, error: textsError } = await sb
             .from('texts')
             .select('*')
+            .order("uploaded_at", { ascending: false })
 
         if (textsError) throw textsError
 
@@ -56,7 +57,7 @@ export const getLibrary = async (req, res) => {
       added_at,
       texts (*)
     )
-  `);
+  `).order("created_at", { ascending: false });
 
 
         if (groupsError) throw groupsError;
@@ -306,3 +307,55 @@ export const updateImportance = async (req, res) => {
     return res.status(500).json({ error: "Unexpected server error" });
   }
 };
+
+export const deleteText = async (req, res) => {
+    const sb = req.sb;
+
+    try {
+        const { textId } = req.body;
+
+        if (!textId) return res.status(300).json({ error: "Incomplete data in request" });
+
+        const { data: deletedResult, error: deletionError } = await sb
+        .from("texts")
+        .delete()
+        .eq("id", textId)
+
+        if ( deletionError ) throw deletionError;
+
+        // console.log("Deletion result : ", deletedResult);
+
+        return res.status(200).json({ message : "Deletion successfull"});
+
+    } catch (error) {
+        console.error("Error in delete text controller:", error);
+        return res.status(500).json({ error: "Unexpected server error" });
+    }
+
+}
+
+export const deleteGroup = async (req, res) => {
+    const sb = req.sb;
+
+    try {
+        const { groupId } = req.body;
+
+        if (!groupId) return res.status(300).json({ error: "Incomplete data in request" });
+
+        const { data: deletedResult, error: deletionError } = await sb
+        .from("groups")
+        .delete()
+        .eq("id", groupId)
+
+        if ( deletionError ) throw deletionError;
+
+        // console.log("Deletion result : ", deletedResult);
+
+        return res.status(200).json({ message : "Deletion successfull"});
+
+    } catch (error) {
+        console.error("Error in delte group controller:", error);
+        return res.status(500).json({ error: "Unexpected server error" });
+    }
+
+}

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import requireAuth from "../Middlewares/requireAuth.js";
-import { addInGroup, createGroup, getLibrary, removeFromGroup, uploadText, editText, updateImportance  } from "../Controllers/library.controller.js";
+import { addInGroup, createGroup, getLibrary, removeFromGroup, uploadText, editText, updateImportance, deleteText, deleteGroup  } from "../Controllers/library.controller.js";
 
 const router = Router();
 
@@ -17,5 +17,9 @@ router.post("/add_in_group", requireAuth, addInGroup)
 router.delete("/remove_from_group", requireAuth, removeFromGroup)
 
 router.post("/update_importance", requireAuth, updateImportance)
+
+router.post("/delete_text", requireAuth, deleteText);
+
+router.post("/delete_group", requireAuth, deleteGroup);
 
 export default router;

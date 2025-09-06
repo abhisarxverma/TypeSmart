@@ -4,20 +4,23 @@ import { useLibrary } from "@/Hooks/useLibrary";
 import { Loader2 } from "lucide-react";
 import { FaPencil } from "react-icons/fa6";
 import { Link, useParams } from "react-router-dom"
-import { RiDeleteBinLine } from "react-icons/ri";
 import { giveEditTextRoute } from "@/utils/routing";
 import { FaRegKeyboard } from "react-icons/fa";
 import { getPresentInGroups } from "@/utils/files";
 import PresentInGroups from "@/components/library/TextDetails/PresentInGroups";
+import { useDeleteTextMutation } from "@/Hooks/useBackend";
+import DeleteButton from "@/components/DeleteButton";
 
 
 export default function TextDetails() {
 
     const { id: textId } = useParams();
     const { library, isFetchingLibrary } = useLibrary();
-
+    
+    const { deleteText, isDeletingText } = useDeleteTextMutation(textId ?? "");
+    
     const text = library.texts.find((txt) => txt.id === textId);
-
+    
     if ( isFetchingLibrary ) {
         return (
             <div className="min-h-lg">
@@ -25,7 +28,7 @@ export default function TextDetails() {
             </div>
         )
     }
-
+    
     if ( !text || !textId ) {
         return (
             <h1 className="text-heading">Text not found in your library</h1>
@@ -38,19 +41,19 @@ export default function TextDetails() {
 
     return (
         <>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-7 md:gap-3">
                 <div className="flex flex-col">
                     <h1 className="text-heading-lg font-bold mb-2">{text.title}</h1>
-                    <Badge className="text-[.9rem]" variant="secondary">{text.tag}</Badge>
+                    <Badge className="text-[.9rem]" variant="secondary"># {text.tag}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button title="Type this text only" className=""><FaRegKeyboard /></Button>
-                    <Button variant="secondary" className="hover:text-primary" asChild>
+                    <Button title="Type this text only" variant="secondary"><FaRegKeyboard /> Type</Button>
+                    <Button variant="ghost" className="hover:text-primary" asChild>
                         <Link to={editDetailsRoute}>
                             <FaPencil />
                         </Link>
                     </Button>
-                    <Button variant="secondary" className="hover:text-destructive"><RiDeleteBinLine /></Button>
+                    <DeleteButton deleteFn={deleteText} isDeleting={isDeletingText} />
                 </div>
             </div>
 

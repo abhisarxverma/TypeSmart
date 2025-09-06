@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { FaPlus } from "react-icons/fa6";
+import { FaLayerGroup, FaPlus } from "react-icons/fa6";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import TextsList from "@/components/library/TextsList";
 import GroupsList from "@/components/library/GroupsList";
@@ -41,13 +41,13 @@ export default function Library() {
             <Tabs defaultValue="texts" className="mt-10">
                 <TabsList>
                     <TabsTrigger value="texts">Texts</TabsTrigger>
-                    <TabsTrigger value="groups">Groups</TabsTrigger>
+                    <TabsTrigger value="groups"> Groups</TabsTrigger>
                 </TabsList>
                 <TabsContent className="h-auto" value="texts">
-                    <TextsList texts={library.texts} />
+                    <TextsList />
                 </TabsContent>
                 <TabsContent value="groups">
-                    <GroupsList groups={library.groups} />
+                    <GroupsList />
                 </TabsContent>
             </Tabs>
         </>

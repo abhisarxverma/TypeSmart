@@ -9,12 +9,16 @@ import NoTexts from "@/components/library/GroupDetails/NoTexts";
 import TextPresentCard from "@/components/library/GroupDetails/TextPresentCard";
 import ListLayout from "@/components/layouts/ListLayout";
 import AddTextDialog from "@/components/library/GroupDetails/AddTextDialog/AddTextDialog";
+import { useDeleteGroupMutation } from "@/Hooks/useBackend";
+import DeleteButton from "@/components/DeleteButton";
 
 export default function GroupDetails() {
 
     const { id: groupId } = useParams();
 
     const { library, isFetchingLibrary } = useLibrary();
+
+    const { deleteGroup, isDeletingGroup } = useDeleteGroupMutation(groupId ?? "");
 
     if (isFetchingLibrary) return <LoaderPage />
 
@@ -24,7 +28,7 @@ export default function GroupDetails() {
 
     return (
         <>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-3">
                 <div className="flex flex-col">
                     <h1 className="text-heading font-bold mb-2">{group.name}</h1>
                     <Badge className="text-[.9rem]" variant="secondary"># {group.tag}</Badge>
@@ -34,9 +38,10 @@ export default function GroupDetails() {
                     <AddTextDialog group={group}>
                         <Button variant="ghost"><FaPlus /> Add Text</Button>
                     </AddTextDialog>
+                    <DeleteButton deleteFn={deleteGroup} isDeleting={isDeletingGroup} />
                 </div>
             </div>
-            <p className="text-section-title text-muted-foreground mt-10"><span className="">{group.group_texts.length}</span> Texts </p>
+            <p className="text-section-title text-muted-foreground mt-10"><span className="">{group.group_texts.length}</span> {"Text" + (group.group_texts.length <= 1 ? "" : "s")} </p>
             <div className="flex flex-col mt-10 gap-2">
                 <div className="flex flex-col gap-4">
                     {group.group_texts.length <= 0 ? (

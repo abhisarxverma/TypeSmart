@@ -19,7 +19,7 @@ export default function PresentInGroups({ text, groups }:{ text: Text, groups: G
                 <NoGroups text={text} />
             ): (
             <ListLayout addClass="">
-                {groups.map(grp => (<PresentInGroupCard group={grp} key={grp.id} />))}
+                {groups.map(grp => (<PresentInGroupCard textId={text.id} group={grp} key={grp.id} />))}
             </ListLayout>
             )}
         </div>
