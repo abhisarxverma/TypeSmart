@@ -1,5 +1,5 @@
 import { HiOutlineSearch } from "react-icons/hi";
-import { Input } from "./ui/input";
+import { Input } from "../ui/input";
 
 export default function SearchBar({
     querySetterFn,

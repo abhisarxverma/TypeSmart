@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import AddInGroupCard from "./AddInGroupCard"
-import SearchBar from "@/components/SearchBar"
+import SearchBar from "@/components/library/SearchBar"
 import { useLibrary } from "@/Hooks/useLibrary"
 import type { Group, Text } from "@/Types/Library"
 import LoaderPage from "@/pages/utils/LoaderPage"

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import AddTextCard from "./AddTextCard"
-import SearchBar from "@/components/SearchBar"
+import SearchBar from "@/components/library/SearchBar"
 import { useLibrary } from "@/Hooks/useLibrary"
 import type { Group, TextInGroup } from "@/Types/Library"
 import { useState } from "react"

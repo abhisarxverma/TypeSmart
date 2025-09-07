@@ -1,9 +1,8 @@
 import { formatDistanceToNowStrict } from "date-fns";
 
 export function timeAgo(dateString: string) {
-  return formatDistanceToNowStrict(new Date(dateString), { addSuffix: true });
+  return formatDistanceToNowStrict(new Date(dateString + "Z"), { addSuffix: true });
 }
-
 
 export function normalizeForTyping(input: string): string {
   let t = input.normalize("NFKC");
@@ -19,18 +18,36 @@ export function normalizeForTyping(input: string): string {
     .replace(/[\u2018\u2019]/g, "'")   // ‘ ’ → '
     .replace(/[\u201C\u201D]/g, '"')   // “ ” → "
     .replace(/[\u2013\u2014]/g, "-")   // – — → -
-    .replace(/\u2026/g, "...");       // … → ...
+    .replace(/\u2026/g, "...");        // … → ...
 
-  // Collapse excessive horizontal whitespace (tabs, multiple spaces), but preserve newlines
-  t = t
-    .replace(/[ \t\f\v]+/g, " ")       // Replace tabs and other horizontal whitespace with single space
-    .replace(/ {2,}/g, " ");           // Collapse multiple spaces into one
+  // Replace all horizontal whitespace (tabs, multiple spaces) with single space
+  t = t.replace(/[ \t\f\v]+/g, " ");
 
-  // Optionally strip non-typable symbols (keep common punctuation and newlines)
+  // Ensure exactly ONE space after sentence-ending punctuation
+  t = t.replace(/([.?!])\s+/g, "$1 ");
+
+  // Remove spaces before punctuation
+  t = t.replace(/\s+([.,!?;:'")\]}])/g, "$1");
+
+  // Ensure no multiple spaces anywhere
+  t = t.replace(/ {2,}/g, " ");
+
+  // Normalize line breaks:
+  // - Trim spaces around newlines
+  // - Ensure single \n, not \r\n or multiple \n
+  t = t.replace(/\r\n?/g, "\n");
+  t = t.replace(/ *\n */g, "\n"); 
+  t = t.replace(/\n{2,}/g, "\n\n");
+
+  // Strip non-typable symbols (only allow common punctuation + newlines)
   t = t.replace(/[^.,!?;:'"()\[\]{}<>\-_\/@#*$%+=A-Za-z0-9 \n]/g, "");
+
+  // Trim leading/trailing spaces
+  t = t.trim();
 
   return t;
 }
+
 
 export function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length;

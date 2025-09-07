@@ -8,6 +8,7 @@ import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AuthProvider from './Contexts/AuthProvider.tsx'
 import LibraryProvider from './Contexts/LibraryProvider.tsx'
+import TypingProvider from './Contexts/TypingProvider.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +29,9 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <LibraryProvider>
-              <App />
+            <TypingProvider>
+                <App />
+            </TypingProvider>
           </LibraryProvider>
         </AuthProvider>
       </QueryClientProvider>

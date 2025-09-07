@@ -3,7 +3,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import { RiDeleteBinLine } from "react-icons/ri";
 

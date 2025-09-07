@@ -3,14 +3,13 @@ import { Button } from "@/components/ui/button";
 import { useLibrary } from "@/Hooks/useLibrary";
 import { Loader2 } from "lucide-react";
 import { FaPencil } from "react-icons/fa6";
-import { Link, useParams } from "react-router-dom"
-import { giveEditTextRoute } from "@/utils/routing";
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { giveEditTextRoute, giveTypingPageRoute } from "@/utils/routing";
 import { FaRegKeyboard } from "react-icons/fa";
 import { getPresentInGroups } from "@/utils/files";
 import PresentInGroups from "@/components/library/TextDetails/PresentInGroups";
 import { useDeleteTextMutation } from "@/Hooks/useBackend";
-import DeleteButton from "@/components/DeleteButton";
-
+import DeleteButton from "@/components/library/DeleteButton";
 
 export default function TextDetails() {
 
@@ -18,6 +17,8 @@ export default function TextDetails() {
     const { library, isFetchingLibrary } = useLibrary();
     
     const { deleteText, isDeletingText } = useDeleteTextMutation(textId ?? "");
+
+    const navigate = useNavigate();
     
     const text = library.texts.find((txt) => txt.id === textId);
     
@@ -35,6 +36,11 @@ export default function TextDetails() {
         )
     }
 
+    function handleType() {
+        setTypingText(text.text);
+        navigate(giveTypingPageRoute());
+    }
+
     const editDetailsRoute = giveEditTextRoute(textId);
 
     const presentInGroups = getPresentInGroups(text.id, library.groups);
@@ -47,7 +53,7 @@ export default function TextDetails() {
                     <Badge className="text-[.9rem]" variant="secondary"># {text.tag}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button title="Type this text only" variant="secondary"><FaRegKeyboard /> Type</Button>
+                    <Button onClick={handleType} title="Type this text only" variant="secondary"><FaRegKeyboard /> Type</Button>
                     <Button variant="ghost" className="hover:text-primary" asChild>
                         <Link to={editDetailsRoute}>
                             <FaPencil />

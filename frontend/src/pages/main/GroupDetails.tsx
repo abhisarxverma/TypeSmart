@@ -10,7 +10,7 @@ import TextPresentCard from "@/components/library/GroupDetails/TextPresentCard";
 import ListLayout from "@/components/layouts/ListLayout";
 import AddTextDialog from "@/components/library/GroupDetails/AddTextDialog/AddTextDialog";
 import { useDeleteGroupMutation } from "@/Hooks/useBackend";
-import DeleteButton from "@/components/DeleteButton";
+import DeleteButton from "@/components/library/DeleteButton";
 
 export default function GroupDetails() {
 

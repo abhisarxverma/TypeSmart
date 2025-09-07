@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import { giveTypingPageRoute } from "@/utils/routing";
 
 export default function Header() {
     return (
@@ -10,7 +11,9 @@ export default function Header() {
                 <span className="text-xl font-bold">TypeSmart</span>
             </div>
             <nav className="flex items-center gap-1">
-                <Button variant="ghost">Type</Button>
+                <Button variant="ghost" asChild>
+                    <Link to={giveTypingPageRoute()}>Type</Link>
+                </Button>
                 <Button variant="ghost" asChild>
                     <Link to="/app/library">Library</Link>
                 </Button>

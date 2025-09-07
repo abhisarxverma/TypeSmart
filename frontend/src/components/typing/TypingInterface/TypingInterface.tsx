@@ -3,16 +3,15 @@
 import { useRef, memo, useEffect, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import clsx from "clsx";
-import { useTypingText } from "@/Hooks/useTypingText"
-import styles from "./TypingInterface.module.css";
+import { useTyping } from "../../../Hooks/useTyping"
 import toast from "react-hot-toast";
 
 type Status = "pending" | "correct" | "incorrect" | "current";
 
 const STATUS_CLASS: Record<Status, string> = {
   pending: "text-gray-400",
-  correct: clsx("text-foreground", styles.typed),
-  incorrect: clsx("text-red-500", styles.typed),
+  correct: clsx("text-foreground"),
+  incorrect: clsx("text-red-500"),
   current: "text-orange-200",
 };
 
@@ -24,7 +23,7 @@ export type WindowConfig = {
 
 // Default: 3 lines window
 const WINDOW: WindowConfig = {
-  lines: 5,
+  lines: 3,
   overscan: 1,
   edgePadding: 1,
 };
@@ -57,7 +56,8 @@ const Char = memo(
 type LineInfo = { start: number; end: number; top: number };
 
 export default function TypingInterface() {
-  const { typingText } = useTypingText();
+  const { state } = useTyping();
+  const typingText = state.typingText;
   const characters = typingText.split("");
 
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -76,7 +76,7 @@ export default function TypingInterface() {
     statusRef.current[index] = status;
     const el = spanRefs.current[index];
     if (!el) return;
-    el.className = `${STATUS_CLASS[status]} transition-colors duration-150 ${styles.character}`;
+    el.className = `${STATUS_CLASS[status]} transition-colors duration-150`;
   };
 
   const clampIndex = (i: number) =>
@@ -211,8 +211,7 @@ export default function TypingInterface() {
     <div
       ref={containerRef}
       className={clsx(
-        styles.textBox,
-        "max-w-3xl mx-auto font-mono text-heading leading-relaxed relative"
+        "max-w-4xl mx-auto text-heading font-semibold [word-spacing:10px] leading-relaxed relative [text-align:justify] [text-justify:center]"
       )}
     >
       <div
@@ -240,8 +239,8 @@ export default function TypingInterface() {
         })}
 
         <motion.div
-          className="absolute w-0.5 bg-blue-500"
-          style={{ left, top, height: "var(--fs-h2)" }}
+          className="absolute w-0.5 bg-primary"
+          style={{ left, top, height: "2rem" }}
           animate={{ opacity: [1, 0, 1] }}
           transition={{
             opacity: { duration: 1, repeat: Infinity, ease: "linear" },

@@ -78,7 +78,7 @@ export default function AddNewTextForm({ fileType, text, textSettingFn } : {file
         setFile(f);
         const reader = new FileReader();
         reader.onload = (event) => {
-            textSettingFn(normalizeForTyping(event.target?.result as string));
+            textSettingFn(event.target?.result as string);
         };
         reader.readAsText(f);
     }

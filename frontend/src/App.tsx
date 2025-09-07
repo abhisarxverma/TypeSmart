@@ -10,6 +10,7 @@ import AddText from "./pages/main/AddText";
 import TextDetails from "./pages/main/TextDetails";
 import EditText from "./pages/main/EditText";
 import GroupDetails from "./pages/main/GroupDetails";
+import TypingPage from "./pages/typing/TypingPage";
 
 export default function App() {
 
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="library/text/:id" element={<TextDetails />} />
         <Route path="library/edit-text/:id" element={<EditText />} />
         <Route path="library/group/:id" element={<GroupDetails />} />
+        <Route path="typing" element={<TypingPage />} />
       </Route>
 
 
@@ -43,7 +45,6 @@ export default function App() {
       </Route>
 
       <Route path="/login-signup" element={<AuthPage />} />
-
 
     </Routes>
   )

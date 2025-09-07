@@ -1,4 +1,4 @@
-import SearchBar from "../SearchBar";
+import SearchBar from "./SearchBar";
 import EmptyList from "./TextDetails/EmptyList";
 import TextCard from "./cards/TextCard";
 import ListLayout from "../layouts/ListLayout";
@@ -7,7 +7,7 @@ import { useLibrary } from "@/Hooks/useLibrary";
 import LoaderPage from "@/pages/utils/LoaderPage";
 import { useSearch } from "@/Hooks/useSearch";
 import type { Text } from "@/Types/Library";
-import NoResults from "../NoResults";
+import NoResults from "./NoResults";
 
 export default function TextsList() {
 

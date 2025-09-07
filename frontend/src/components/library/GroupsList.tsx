@@ -1,4 +1,4 @@
-import SearchBar from "../SearchBar";
+import SearchBar from "./SearchBar";
 import EmptyList from "./TextDetails/EmptyList";
 import ListLayout from "../layouts/ListLayout";
 import GroupCard from "./cards/GroupCard";
@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { useSearch } from "@/Hooks/useSearch";
 import type { Group } from "@/Types/Library";
 import LoaderPage from "@/pages/utils/LoaderPage";
-import NoResults from "../NoResults";
+import NoResults from "./NoResults";
 
 export default function GroupsList() {
 

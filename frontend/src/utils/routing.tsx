@@ -22,3 +22,7 @@ export function giveAuthRoute() {
 export function giveGroupDetailsRoute( groupId: string ) {
     return "/app/library/group/"+groupId
 }
+
+export function giveTypingPageRoute() {
+    return "/app/typing";
+}
