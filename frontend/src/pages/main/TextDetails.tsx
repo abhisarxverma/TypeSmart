@@ -10,11 +10,14 @@ import { getPresentInGroups } from "@/utils/files";
 import PresentInGroups from "@/components/library/TextDetails/PresentInGroups";
 import { useDeleteTextMutation } from "@/Hooks/useBackend";
 import DeleteButton from "@/components/library/DeleteButton";
+import { useTyping } from "@/Hooks/useTyping";
 
 export default function TextDetails() {
 
     const { id: textId } = useParams();
     const { library, isFetchingLibrary } = useLibrary();
+
+    const { startText } = useTyping();
     
     const { deleteText, isDeletingText } = useDeleteTextMutation(textId ?? "");
 
@@ -37,7 +40,8 @@ export default function TextDetails() {
     }
 
     function handleType() {
-        setTypingText(text.text);
+        if (!text) return;
+        startText(text);
         navigate(giveTypingPageRoute());
     }
 

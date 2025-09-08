@@ -1,5 +1,5 @@
 import { useLibrary } from "@/Hooks/useLibrary";
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import LoaderPage from "../utils/LoaderPage";
 import NotFound from "../utils/NotFound";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,9 @@ import ListLayout from "@/components/layouts/ListLayout";
 import AddTextDialog from "@/components/library/GroupDetails/AddTextDialog/AddTextDialog";
 import { useDeleteGroupMutation } from "@/Hooks/useBackend";
 import DeleteButton from "@/components/library/DeleteButton";
+import { useTyping } from "@/Hooks/useTyping";
+import { giveTypingPageRoute } from "@/utils/routing";
+import toast from "react-hot-toast";
 
 export default function GroupDetails() {
 
@@ -18,13 +21,27 @@ export default function GroupDetails() {
 
     const { library, isFetchingLibrary } = useLibrary();
 
+    const { startGroup } = useTyping();
+
     const { deleteGroup, isDeletingGroup } = useDeleteGroupMutation(groupId ?? "");
+
+    const navigate = useNavigate();
 
     if (isFetchingLibrary) return <LoaderPage />
 
     const group = library.groups.find(grp => grp.id === groupId);
 
     if (!groupId || !group) return <NotFound text="Group not found" />
+
+    function handleType() {
+        if (!group) return;
+        if (!group.group_texts || group.group_texts.length <= 0) {
+            toast.error("Group is empty, please add text to type.");
+            return;
+        }
+        startGroup(group);
+        navigate(giveTypingPageRoute());
+    }
 
     return (
         <>
@@ -34,7 +51,7 @@ export default function GroupDetails() {
                     <Badge className="text-[.9rem]" variant="secondary"># {group.tag}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="secondary"><FaKeyboard /> Type</Button>
+                    <Button onClick={handleType} variant="secondary"><FaKeyboard /> Type</Button>
                     <AddTextDialog group={group}>
                         <Button variant="ghost"><FaPlus /> Add Text</Button>
                     </AddTextDialog>

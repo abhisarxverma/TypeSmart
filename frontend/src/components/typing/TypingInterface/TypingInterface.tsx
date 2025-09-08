@@ -56,7 +56,7 @@ const Char = memo(
 type LineInfo = { start: number; end: number; top: number };
 
 export default function TypingInterface() {
-  const { state } = useTyping();
+  const { state, updateProgress } = useTyping();
   const typingText = state.typingText;
   const characters = typingText.split("");
 
@@ -148,6 +148,7 @@ export default function TypingInterface() {
     currentIndexRef.current = i - 1;
     updateWindowForIndex(currentIndexRef.current);
     moveCursorToIndex(currentIndexRef.current);
+    updateProgress(currentIndexRef.current, spanRefs.current.length);
   };
 
   const handleChar = (key: string) => {
@@ -182,6 +183,7 @@ export default function TypingInterface() {
     if (e.key.length !== 1) return;
 
     handleChar(e.key);
+    updateProgress(currentIndexRef.current, spanRefs.current.length);
   };
 
   useEffect(() => {
@@ -211,7 +213,7 @@ export default function TypingInterface() {
     <div
       ref={containerRef}
       className={clsx(
-        "max-w-4xl mx-auto text-heading font-semibold [word-spacing:10px] leading-relaxed relative [text-align:justify] [text-justify:center]"
+        "text-heading font-semibold [word-spacing:10px] leading-relaxed relative [text-align:justify] [text-justify:center]"
       )}
     >
       <div
