@@ -57,7 +57,7 @@ const Char = memo(
 type LineInfo = { start: number; end: number; top: number };
 
 export default function TypingInterface() {
-  const { typingText } = useTypingText();
+  const { typingText, statsRef } = useTypingText();
   const characters = typingText.split("");
 
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -77,6 +77,7 @@ export default function TypingInterface() {
     const el = spanRefs.current[index];
     if (!el) return;
     el.className = `${STATUS_CLASS[status]} transition-colors duration-150 ${styles.character}`;
+
   };
 
   const clampIndex = (i: number) =>
@@ -156,6 +157,12 @@ export default function TypingInterface() {
 
     const expected = characters[i];
     const isCorrect = key === expected;
+
+    if (isCorrect) {
+      statsRef.current.correct++;
+    } else {
+      statsRef.current.incorrect++;
+    }
 
     applyStatus(i, isCorrect ? "correct" : "incorrect");
 

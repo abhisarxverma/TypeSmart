@@ -18,6 +18,18 @@ export interface TypingState {
   segments?: TextSegment[] | null
 }
 
+export interface StatsRefObject {
+  correct: number
+  incorrect: number
+  startedAt : number
+}
+
+export interface Stats {
+  elapsed: number
+  wpm: number
+  accuracy : number
+}
+
 interface TypingContextType {
   state: TypingState;
   startText: (text: Text) => void;
@@ -27,6 +39,8 @@ interface TypingContextType {
   completeRound: () => void;
   progressRef : React.RefObject<number>
   getCurrentTextName: () => string | null;
+  statsRef : React.RefObject<StatsRefObject>;
+  getCurrentStats: () => Stats;
 }
 
 export const TypingContext = createContext<TypingContextType | null>(null);

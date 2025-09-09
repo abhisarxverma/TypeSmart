@@ -10,8 +10,8 @@ type Status = "pending" | "correct" | "incorrect" | "current";
 
 const STATUS_CLASS: Record<Status, string> = {
   pending: "text-gray-400",
-  correct: clsx("text-foreground"),
-  incorrect: clsx("text-red-500"),
+  correct: clsx("text-foreground bg-green-700"),
+  incorrect: clsx("text-red-500 bg-red-700"),
   current: "text-orange-200",
 };
 
@@ -56,7 +56,7 @@ const Char = memo(
 type LineInfo = { start: number; end: number; top: number };
 
 export default function TypingInterface() {
-  const { state, updateProgress } = useTyping();
+  const { state, updateProgress, statsRef } = useTyping();
   const typingText = state.typingText;
   const characters = typingText.split("");
 
@@ -77,6 +77,8 @@ export default function TypingInterface() {
     const el = spanRefs.current[index];
     if (!el) return;
     el.className = `${STATUS_CLASS[status]} transition-colors duration-150`;
+    if (status === "correct") statsRef.current.correct++;
+    else statsRef.current.incorrect++;
   };
 
   const clampIndex = (i: number) =>

@@ -3,7 +3,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { dummyText } from "@/Data/dummy";
 import type { Text, Group } from "@/Types/Library";
 import { normalizeForTyping } from "@/utils/text";
-import { TypingContext, type TextSegment, type TypingState } from "@/Hooks/useTyping";
+import { TypingContext, type StatsRefObject, type TextSegment, type TypingState } from "@/Hooks/useTyping";
 import { useLibrary } from "@/Hooks/useLibrary";
 
 
@@ -21,8 +21,20 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
 
   const progressRef = useRef<number>(0);
 
+  const statsRef = useRef<StatsRefObject>({
+    correct: 0,
+    incorrect: 0,
+    startedAt: 0,
+  });
+
+
   const startText = (text: Text) => {
     progressRef.current = 0;
+    statsRef.current = {
+      correct: 0,
+      incorrect: 0,
+      startedAt: Date.now()
+    }
     setState({
       mode: "text",
       typingText: normalizeForTyping(text.text),
@@ -37,14 +49,20 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     const segments: TextSegment[] = [];
     let combined = "";
 
+
     group.group_texts.forEach((t) => {
       const norm = normalizeForTyping(t.text);
       const start = combined.length;
       combined += (combined ? " " : "") + norm;
       const end = combined.length - 1;
-      segments.push({ textId: t.title, start, end });
+      segments.push({ textId: t.id, start, end });
     });
     progressRef.current = 0;
+    statsRef.current = {
+      correct: 0,
+      incorrect: 0,
+      startedAt: Date.now()
+    }
 
     setState({
       mode: "group",
@@ -106,6 +124,36 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     return null;
   };
 
+  const getCurrentStats = () => {
+    const { correct, incorrect, startedAt } = statsRef.current;
+
+    if (!startedAt) {
+      return { wpm: 0, accuracy: 100, elapsed: 0 };
+    }
+
+    const now = Date.now();
+    const elapsedMs = Math.max(now - startedAt, 1); // avoid divide by zero
+    const elapsedMinutes = elapsedMs / 1000 / 60;
+
+    // WPM = (correct chars / 5) / minutes
+    const grossWpm = (correct / 5) / elapsedMinutes;
+    const wpm = Math.max(0, Math.round(grossWpm));
+
+    // Accuracy = correct / total typed
+    const totalTyped = correct + incorrect;
+    const accuracy = totalTyped > 0
+      ? Math.min(100, Math.max(0, Math.round((correct / totalTyped) * 100)))
+      : 100;
+
+    return {
+      wpm,
+      accuracy,
+      elapsed: Math.floor(elapsedMs / 1000), // seconds
+    };
+  };
+
+
+
   console.log("TYPING TEXT : ", state.typingText);
 
   return (
@@ -118,7 +166,9 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
         updateProgress,
         completeRound,
         progressRef,
-        getCurrentTextName
+        getCurrentTextName,
+        statsRef,
+        getCurrentStats
       }}
     >
       {children}
