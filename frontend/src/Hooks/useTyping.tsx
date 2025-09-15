@@ -22,12 +22,13 @@ export interface StatsRefObject {
   correct: number
   incorrect: number
   startedAt : number
+  elapsedPaused: number;   // total ms spent paused
+  pausedAt?: number;       // when the current pause started
+  isPaused: boolean;
 }
 
 export interface Stats {
-  elapsed: number
-  wpm: number
-  accuracy : number
+  wpm: number  
 }
 
 interface TypingContextType {
@@ -41,6 +42,8 @@ interface TypingContextType {
   getCurrentTextName: () => string | null;
   statsRef : React.RefObject<StatsRefObject>;
   getCurrentStats: () => Stats;
+  pause: () => void;
+  resume: () => void;
 }
 
 export const TypingContext = createContext<TypingContextType | null>(null);

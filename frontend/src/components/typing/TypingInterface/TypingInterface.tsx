@@ -10,8 +10,8 @@ type Status = "pending" | "correct" | "incorrect" | "current";
 
 const STATUS_CLASS: Record<Status, string> = {
   pending: "text-gray-400",
-  correct: clsx("text-foreground bg-green-700"),
-  incorrect: clsx("text-red-500 bg-red-700"),
+  correct: clsx("text-foreground"),
+  incorrect: clsx("text-red-500"),
   current: "text-orange-200",
 };
 
@@ -55,13 +55,12 @@ const Char = memo(
 
 type LineInfo = { start: number; end: number; top: number };
 
-export default function TypingInterface() {
+export default function TypingInterface({ containerRef }: { containerRef?: React.RefObject<HTMLDivElement> }) {
   const { state, updateProgress, statsRef } = useTyping();
   const typingText = state.typingText;
   const characters = typingText.split("");
 
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
   const currentIndexRef = useRef(0);
   const statusRef = useRef<Status[]>([]);
 
@@ -85,7 +84,7 @@ export default function TypingInterface() {
     Math.max(0, Math.min(i, characters.length - 1));
 
   const moveCursorToIndex = (i: number) => {
-    const container = containerRef.current;
+    const container = containerRef?.current;
     const span = spanRefs.current[clampIndex(i)];
     if (!container || !span) return;
 
@@ -175,6 +174,9 @@ export default function TypingInterface() {
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!statsRef.current.startedAt) {
+      statsRef.current.startedAt = Date.now();
+    }
     if (e.key === " " || e.key === "Backspace") e.preventDefault();
 
     if (e.key === "Backspace") {
@@ -203,6 +205,28 @@ export default function TypingInterface() {
     moveCursorToIndex(currentIndexRef.current);
   }, [windowStartLine, characters.length]);
 
+  useEffect(() => {
+    // reset typing interface when new round starts
+    currentIndexRef.current = 0;
+    statusRef.current = Array(characters.length).fill("pending");
+    if (characters.length > 0) {
+      statusRef.current[0] = "current";
+    }
+    setWindowStartLine(0);
+
+    // move caret to start
+    requestAnimationFrame(() => {
+      moveCursorToIndex(0);
+    });
+  }, [state.startedAt, characters.length]);
+
+  useEffect(() => {
+    if (containerRef?.current) {
+      containerRef?.current.focus();
+    }
+  }, [state.startedAt, typingText]);
+
+
   // --- Visible slice calculation (by line) ---
   const { lines, overscan } = WINDOW;
   const startLine = Math.max(0, windowStartLine - overscan);
@@ -214,8 +238,10 @@ export default function TypingInterface() {
   return (
     <div
       ref={containerRef}
+      onKeyDown={onKeyDown}
+      tabIndex={0}
       className={clsx(
-        "text-heading font-semibold [word-spacing:10px] leading-relaxed relative [text-align:justify] [text-justify:center]"
+        "text-heading font-semibold [word-spacing:10px] leading-relaxed relative [text-align:justify] [text-justify:center] focus:outline-none focus:border-none"
       )}
     >
       <div

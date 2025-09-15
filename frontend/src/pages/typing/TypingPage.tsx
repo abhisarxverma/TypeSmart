@@ -1,16 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLibrary } from "@/Hooks/useLibrary";
 import { useTyping } from "@/Hooks/useTyping";
 import { FaFile, FaLayerGroup } from "react-icons/fa6";
 import TypingInterface from "@/components/typing/TypingInterface/TypingInterface";
 import ProgressBar from "@/components/typing/TypingInterface/ProgressBar";
+import { Button } from "@/components/ui/button";
+import { IoIosPause } from "react-icons/io";
+import { VscDebugRestart } from "react-icons/vsc";
+import { FaPlay } from "react-icons/fa";
+
 
 export default function TypingPage() {
-  const { state, getCurrentTextName, getCurrentStats } = useTyping();
+  const { state, getCurrentTextName, getCurrentStats, resetRound, statsRef, resume, pause } = useTyping();
   const { library } = useLibrary();
 
   const [currentTextName, setCurrentTextName] = useState<string | null>(null);
-  const [stats, setStats] = useState({ wpm: 0, accuracy: 100, elapsed: 0 });
+  const [stats, setStats] = useState({ wpm: 0 });
+
+  const typingContainerRef = useRef<HTMLDivElement>(null);
+
+  const handlePause = () => {
+    if (statsRef.current.isPaused) resume();
+    else pause();
+    typingContainerRef.current?.focus();
+  };
+
+  const handleRestart = () => {
+    resetRound();
+    typingContainerRef.current?.focus();
+  };
 
   // Poll for current file name
   useEffect(() => {
@@ -38,6 +56,12 @@ export default function TypingPage() {
     <div className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mt-10 mb-15">
+        {state.mode === "idle" && (
+          <span className="text-xl flex items-center text-muted-foreground gap-2">
+            <FaFile />
+            <span className="font-semibold">Demo Text</span>
+          </span>
+        )}
         {state.mode === "text" && (
           <span className="text-xl flex items-center text-muted-foreground gap-2">
             <FaFile />
@@ -61,16 +85,29 @@ export default function TypingPage() {
       </div>
 
       {/* Typing area */}
-      <TypingInterface />
+      <TypingInterface containerRef={typingContainerRef} />
 
       {/* Progress bar */}
       <ProgressBar addClass="mt-10" />
 
       {/* Stats */}
-      <div className="mt-6 flex justify-around text-lg text-muted-foreground">
+      <div className="mt-6 flex justify-between text-lg text-muted-foreground">
         <span>WPM: <strong>{stats.wpm}</strong></span>
-        <span>Accuracy: <strong>{stats.accuracy}%</strong></span>
-        <span>Time: <strong>{stats.elapsed}s</strong></span>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              if (statsRef.current.isPaused) {
+                  handleRestart()
+              } else {
+                  handlePause()
+              }
+            }}
+          >
+            {statsRef.current.isPaused ? <FaPlay /> : <IoIosPause />}
+          </Button>
+          <Button variant="ghost" onClick={resetRound}><VscDebugRestart /></Button>
+        </div>
       </div>
     </div>
   );

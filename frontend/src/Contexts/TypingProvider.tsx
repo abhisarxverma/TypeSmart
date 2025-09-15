@@ -1,4 +1,3 @@
-"use client";
 import { useRef, useState, type ReactNode } from "react";
 import { dummyText } from "@/Data/dummy";
 import type { Text, Group } from "@/Types/Library";
@@ -25,6 +24,8 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     correct: 0,
     incorrect: 0,
     startedAt: 0,
+    elapsedPaused: 0,
+    isPaused: false,
   });
 
 
@@ -33,7 +34,9 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     statsRef.current = {
       correct: 0,
       incorrect: 0,
-      startedAt: Date.now()
+      startedAt: Date.now(),
+      elapsedPaused: 0,
+      isPaused: false,
     }
     setState({
       mode: "text",
@@ -61,7 +64,9 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     statsRef.current = {
       correct: 0,
       incorrect: 0,
-      startedAt: Date.now()
+      startedAt: Date.now(),
+      elapsedPaused: 0,
+      isPaused: false,
     }
 
     setState({
@@ -75,21 +80,30 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // const resetRound = () => {
-  //   if (state.source?.type === "text") {
-  //     // restart text
-  //     startText(library.texts.find(txt => txt.id===(state?.source?.id)) as Text);
-  //   } else if (state.source?.type === "group") {
-  //     // restart group — in real app we’d reload from library, here we reuse text
-  //     startGroup({ id: state.source.id, texts: [{ id: "dummy", content: state.typingText }] } as Group);
-  //   } else {
-  //     setState(defaultState);
-  //   }
-  // };
+  const resetRound = () => {
+    progressRef.current = 0;
+    statsRef.current = {
+      correct: 0,
+      incorrect: 0,
+      startedAt: Date.now(),
+      elapsedPaused: 0,
+      isPaused: false,
+    };
 
-  function resetRound() {
-    return;
-  }
+    if (state.source?.type === "text") {
+      const text = library.texts.find(t => t.id === state.source?.id);
+      if (text) startText(text);
+    } else if (state.source?.type === "group") {
+      const group = library.groups.find(g => g.id === state.source?.id);
+      if (group) startGroup(group);
+    } else {
+      setState({
+        ...defaultState,
+        startedAt: Date.now()
+      });
+    }
+  };
+
 
   const updateProgress = (index: number, total: number) => {
     progressRef.current = Math.round((index / total) * 100);
@@ -125,31 +139,43 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   };
 
   const getCurrentStats = () => {
-    const { correct, incorrect, startedAt } = statsRef.current;
+    const { correct, startedAt, elapsedPaused, pausedAt, isPaused } = statsRef.current;
 
-    if (!startedAt) {
-      return { wpm: 0, accuracy: 100, elapsed: 0 };
-    }
+    if (!startedAt) return { wpm: 0 };
 
     const now = Date.now();
-    const elapsedMs = Math.max(now - startedAt, 1); // avoid divide by zero
-    const elapsedMinutes = elapsedMs / 1000 / 60;
+    let totalPaused = elapsedPaused;
 
-    // WPM = (correct chars / 5) / minutes
+    if (isPaused && pausedAt) {
+      totalPaused += now - pausedAt;
+    }
+
+    const activeMs = Math.max(now - startedAt - totalPaused, 1);
+    const elapsedMinutes = activeMs / 1000 / 60;
+
     const grossWpm = (correct / 5) / elapsedMinutes;
     const wpm = Math.max(0, Math.round(grossWpm));
 
-    // Accuracy = correct / total typed
-    const totalTyped = correct + incorrect;
-    const accuracy = totalTyped > 0
-      ? Math.min(100, Math.max(0, Math.round((correct / totalTyped) * 100)))
-      : 100;
+    return { wpm };
+  };
 
-    return {
-      wpm,
-      accuracy,
-      elapsed: Math.floor(elapsedMs / 1000), // seconds
-    };
+
+  const pause = () => {
+    if (!statsRef.current.isPaused) {
+      statsRef.current.isPaused = true;
+      statsRef.current.pausedAt = Date.now();
+    }
+  };
+
+  const resume = () => {
+    if (statsRef.current.isPaused) {
+      const now = Date.now();
+      if (statsRef.current.pausedAt) {
+        statsRef.current.elapsedPaused += now - statsRef.current.pausedAt;
+      }
+      statsRef.current.isPaused = false;
+      statsRef.current.pausedAt = undefined;
+    }
   };
 
 
@@ -168,7 +194,9 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
         progressRef,
         getCurrentTextName,
         statsRef,
-        getCurrentStats
+        getCurrentStats,
+        pause,
+        resume
       }}
     >
       {children}
