@@ -1,5 +1,4 @@
-// app/components/TypingInterface.tsx
-"use client";
+
 import { useRef, memo, useEffect, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import clsx from "clsx";
@@ -8,11 +7,16 @@ import toast from "react-hot-toast";
 
 type Status = "pending" | "correct" | "incorrect" | "current";
 
-const STATUS_CLASS: Record<Status, string> = {
+function getSpeedColor(wpm: number) {
+  if (wpm < 30) return "text-blue-400";
+  if (wpm < 60) return "text-green-400";
+  return "text-yellow-400";
+}
+
+const STATUS_CLASS: Record<Exclude<Status, "current">, string> = {
   pending: "text-gray-400",
-  correct: clsx("text-foreground"),
-  incorrect: clsx("text-red-500"),
-  current: "text-orange-200",
+  correct: "text-foreground",
+  incorrect: "text-gray-500",
 };
 
 export type WindowConfig = {
@@ -34,13 +38,15 @@ const Char = memo(
     status,
     spanRef,
     index,
+    currentStyle
   }: {
     char: string;
     status: Status;
     spanRef?: (el: HTMLSpanElement | null) => void;
     index: number;
+    currentStyle: string
   }) => {
-    const style = STATUS_CLASS[status];
+    const style = status === "current" ? currentStyle : STATUS_CLASS[status as Exclude<Status, "current">];
     return (
       <span
         ref={spanRef}
@@ -55,8 +61,8 @@ const Char = memo(
 
 type LineInfo = { start: number; end: number; top: number };
 
-export default function TypingInterface({ containerRef }: { containerRef?: React.RefObject<HTMLDivElement> }) {
-  const { state, updateProgress, statsRef } = useTyping();
+export default function TypingInterface({ containerRef }: { containerRef?: React.RefObject<HTMLDivElement> | null }) {
+  const { state, updateProgress, statsRef, resume, getCurrentStats } = useTyping();
   const typingText = state.typingText;
   const characters = typingText.split("");
 
@@ -71,11 +77,27 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
   const [windowStartLine, setWindowStartLine] = useState(0);
   const [lineMap, setLineMap] = useState<LineInfo[]>([]);
 
+  const [wpm, setWpm] = useState(0);
+
+  const currentStyle = getSpeedColor(wpm);
+
+  useEffect(() => {
+    let frame: number;
+    const tick = () => {
+      setWpm(getCurrentStats().wpm);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [getCurrentStats]);
+
+
   const applyStatus = (index: number, status: Status) => {
     statusRef.current[index] = status;
     const el = spanRefs.current[index];
     if (!el) return;
-    el.className = `${STATUS_CLASS[status]} transition-colors duration-150`;
+    const style = status === "current" ? currentStyle : STATUS_CLASS[status];
+    el.className = `${style} transition-colors duration-150`;
     if (status === "correct") statsRef.current.correct++;
     else statsRef.current.incorrect++;
   };
@@ -188,6 +210,7 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
 
     handleChar(e.key);
     updateProgress(currentIndexRef.current, spanRefs.current.length);
+    if (statsRef.current.isPaused) resume();
   };
 
   useEffect(() => {
@@ -264,6 +287,7 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
               spanRef={(el) => {
                 spanRefs.current[globalIndex] = el;
               }}
+              currentStyle={currentStyle}
             />
           );
         })}

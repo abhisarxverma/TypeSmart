@@ -96,17 +96,11 @@ export default function TypingPage() {
         <div className="flex justify-end gap-2">
           <Button
             variant="ghost"
-            onClick={() => {
-              if (statsRef.current.isPaused) {
-                  handleRestart()
-              } else {
-                  handlePause()
-              }
-            }}
+            onClick={handlePause}
           >
             {statsRef.current.isPaused ? <FaPlay /> : <IoIosPause />}
           </Button>
-          <Button variant="ghost" onClick={resetRound}><VscDebugRestart /></Button>
+          <Button variant="ghost" onClick={handleRestart}><VscDebugRestart /></Button>
         </div>
       </div>
     </div>
