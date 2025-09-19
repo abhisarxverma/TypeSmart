@@ -4,6 +4,7 @@ import type { Text, Group } from "@/Types/Library";
 import { normalizeForTyping } from "@/utils/text";
 import { TypingContext, type StatsRefObject, type TextSegment, type TypingState } from "@/Hooks/useTyping";
 import { useLibrary } from "@/Hooks/useLibrary";
+import { getPortionByImportance, shuffle } from "@/utils/group";
 
 
 const defaultState: TypingState = {
@@ -26,6 +27,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     startedAt: 0,
     elapsedPaused: 0,
     isPaused: false,
+    completed: false
   });
 
 
@@ -37,6 +39,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       startedAt: Date.now(),
       elapsedPaused: 0,
       isPaused: false,
+      completed: false
     }
     setState({
       mode: "text",
@@ -49,17 +52,24 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   };
 
   const startGroup = (group: Group) => {
-    const segments: TextSegment[] = [];
+    
+    const selectedTexts = group.group_texts.map(txtObj => {
+      return getPortionByImportance(txtObj.text, txtObj.importance as "high" | "medium" | "low");
+    });
+    
+    const typingText = shuffle(selectedTexts).join(" ");
+    
     let combined = "";
+    const segments: TextSegment[] = [];
 
-
-    group.group_texts.forEach((t) => {
+    typingText.forEach((t) => {
       const norm = normalizeForTyping(t.text);
       const start = combined.length;
       combined += (combined ? " " : "") + norm;
       const end = combined.length - 1;
       segments.push({ textId: t.id, start, end });
     });
+
     progressRef.current = 0;
     statsRef.current = {
       correct: 0,
@@ -67,6 +77,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       startedAt: Date.now(),
       elapsedPaused: 0,
       isPaused: false,
+      completed: false
     }
 
     setState({
@@ -88,6 +99,8 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       startedAt: Date.now(),
       elapsedPaused: 0,
       isPaused: false,
+      completed: false,
+      finalWpm: undefined
     };
 
     if (state.source?.type === "text") {
@@ -104,7 +117,6 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     }
   };
 
-
   const updateProgress = (index: number, total: number) => {
     progressRef.current = Math.round((index / total) * 100);
   };
@@ -115,6 +127,10 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       progress: 100,
       finishedAt: Date.now(),
     }));
+    if (statsRef.current) {
+      statsRef.current.completed = true;
+      statsRef.current.finalWpm = getCurrentStats()?.wpm;
+    }
   };
 
   const getCurrentTextName = (): string | null => {
@@ -139,9 +155,13 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   };
 
   const getCurrentStats = () => {
-    const { correct, startedAt, elapsedPaused, pausedAt, isPaused } = statsRef.current;
+    const { correct, startedAt, elapsedPaused, pausedAt, isPaused, completed, finalWpm } = statsRef.current;
 
     if (!startedAt) return { wpm: 0 };
+
+    if (completed && finalWpm !== undefined) {
+      return { wpm: finalWpm };
+    }
 
     const now = Date.now();
     let totalPaused = elapsedPaused;
@@ -177,10 +197,6 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       statsRef.current.pausedAt = undefined;
     }
   };
-
-
-
-  console.log("TYPING TEXT : ", state.typingText);
 
   return (
     <TypingContext.Provider

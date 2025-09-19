@@ -25,6 +25,8 @@ export interface StatsRefObject {
   elapsedPaused: number;   // total ms spent paused
   pausedAt?: number;       // when the current pause started
   isPaused: boolean;
+  completed: boolean;
+  finalWpm?: number;
 }
 
 export interface Stats {

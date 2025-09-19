@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { IoIosPause } from "react-icons/io";
 import { VscDebugRestart } from "react-icons/vsc";
 import { FaPlay } from "react-icons/fa";
+import RoundCompleted from "@/components/typing/TypingInterface/RoundCompleted";
 
 
 export default function TypingPage() {
@@ -52,57 +53,60 @@ export default function TypingPage() {
     return () => cancelAnimationFrame(frame);
   }, [getCurrentStats]);
 
+  const isCompleted = state.mode !== "idle" && statsRef.current.completed;
+
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mt-10 mb-15">
-        {state.mode === "idle" && (
-          <span className="text-xl flex items-center text-muted-foreground gap-2">
-            <FaFile />
-            <span className="font-semibold">Demo Text</span>
-          </span>
-        )}
-        {state.mode === "text" && (
-          <span className="text-xl flex items-center text-muted-foreground gap-2">
-            <FaFile />
-            <span className="font-semibold">{currentTextName}</span>
-          </span>
-        )}
-        {state.mode === "group" && (
-          <>
-            <span className="text-xl flex items-center text-muted-foreground gap-2">
-              <FaFile />
-              <span className="font-semibold">{currentTextName}</span>
-            </span>
-            <span className="text-xl flex items-center text-muted-foreground gap-2 font-semibold">
-              <FaLayerGroup />
-              {
-                library.groups.find(g => g.id === state.source?.id)?.name
-              }
-            </span>
-          </>
-        )}
-      </div>
+      {isCompleted ? <RoundCompleted wpm={stats.wpm} restartFn={resetRound} /> : (
+        <>
+          <div className="flex items-center justify-between mt-10 mb-15">
+            {state.mode === "idle" && (
+              <span className="text-xl flex items-center text-muted-foreground gap-2">
+                <FaFile />
+                <span className="font-semibold">Demo Text</span>
+              </span>
+            )}
+            {state.mode === "text" && (
+              <span className="text-xl flex items-center text-muted-foreground gap-2">
+                <FaFile />
+                <span className="font-semibold">{currentTextName}</span>
+              </span>
+            )}
+            {state.mode === "group" && (
+              <>
+                <span className="text-xl flex items-center text-muted-foreground gap-2">
+                  <FaFile />
+                  <span className="font-semibold">{currentTextName}</span>
+                </span>
+                <span className="text-xl flex items-center text-muted-foreground gap-2 font-semibold">
+                  <FaLayerGroup />
+                  {
+                    library.groups.find(g => g.id === state.source?.id)?.name
+                  }
+                </span>
+              </>
+            )}
+          </div>
 
-      {/* Typing area */}
-      <TypingInterface containerRef={typingContainerRef} />
+          <TypingInterface containerRef={typingContainerRef} />
 
-      {/* Progress bar */}
-      <ProgressBar addClass="mt-10" />
+          <ProgressBar addClass="mt-10" />
 
-      {/* Stats */}
-      <div className="mt-6 flex justify-between text-lg text-muted-foreground">
-        <span>WPM: <strong>{stats.wpm}</strong></span>
-        <div className="flex justify-end gap-2">
-          <Button
-            variant="ghost"
-            onClick={handlePause}
-          >
-            {statsRef.current.isPaused ? <FaPlay /> : <IoIosPause />}
-          </Button>
-          <Button variant="ghost" onClick={handleRestart}><VscDebugRestart /></Button>
-        </div>
-      </div>
+          <div className="mt-6 flex justify-between text-lg text-muted-foreground">
+            <span>WPM: <strong>{stats.wpm}</strong></span>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={handlePause}
+              >
+                {statsRef.current.isPaused ? <FaPlay /> : <IoIosPause />}
+              </Button>
+              <Button variant="ghost" onClick={handleRestart}><VscDebugRestart /></Button>
+            </div>
+          </div>
+        </>
+      )
+      }
     </div>
   );
 }

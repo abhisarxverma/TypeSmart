@@ -1,5 +1,4 @@
-// app/components/TypingInterface.tsx
-"use client";
+
 import { useRef, memo, useEffect, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import clsx from "clsx";

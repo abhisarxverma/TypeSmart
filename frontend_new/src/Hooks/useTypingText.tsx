@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 type TypingTextContextType = {
   typingText: string;
   setTypingText: (text: string) => void;
+  
 };
 
 export const TypingTextContext = createContext<TypingTextContextType | undefined>(undefined);

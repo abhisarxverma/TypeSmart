@@ -48,7 +48,6 @@ export function normalizeForTyping(input: string): string {
   return t;
 }
 
-
 export function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
