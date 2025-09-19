@@ -14,8 +14,7 @@ export interface TypingState {
   progress: number; 
   startedAt?: number;
   finishedAt?: number;
-  source?: { type: "text"; id: string } | { type: "group"; id: string };
-  segments?: TextSegment[] | null
+  source?: { type: "text"; id: string; name: string } | { type: "group"; id: string; name: string };
 }
 
 export interface StatsRefObject {
@@ -41,7 +40,6 @@ interface TypingContextType {
   updateProgress: (index: number, total: number) => void;
   completeRound: () => void;
   progressRef : React.RefObject<number>
-  getCurrentTextName: () => string | null;
   statsRef : React.RefObject<StatsRefObject>;
   getCurrentStats: () => Stats;
   pause: () => void;

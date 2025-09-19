@@ -10,7 +10,7 @@ export default function RoundCompleted({ wpm, restartFn }: { wpm: number, restar
     const { width, height } = useWindowSize();
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
+        <div className="flex flex-col items-center justify-center py-10 text-center">
             <Confetti 
                 width={width} 
                 height={height}

@@ -1,8 +1,8 @@
 import { useRef, useState, type ReactNode } from "react";
 import { dummyText } from "@/Data/dummy";
 import type { Text, Group } from "@/Types/Library";
-import { normalizeForTyping } from "@/utils/text";
-import { TypingContext, type StatsRefObject, type TextSegment, type TypingState } from "@/Hooks/useTyping";
+import { chunkAndShuffle, normalizeForTyping } from "@/utils/text";
+import { TypingContext, type StatsRefObject, type TypingState } from "@/Hooks/useTyping";
 import { useLibrary } from "@/Hooks/useLibrary";
 import { getPortionByImportance, shuffle } from "@/utils/group";
 
@@ -32,6 +32,10 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
 
 
   const startText = (text: Text) => {
+
+    let typingText = normalizeForTyping(text.text);
+    typingText = chunkAndShuffle(typingText);
+
     progressRef.current = 0;
     statsRef.current = {
       correct: 0,
@@ -43,11 +47,11 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     }
     setState({
       mode: "text",
-      typingText: normalizeForTyping(text.text),
+      typingText: typingText,
       progress: 0,
       startedAt: Date.now(),
       finishedAt: undefined,
-      source: { type: "text", id: text.id },
+      source: { type: "text", id: text.id, name: text.title },
     });
   };
 
@@ -57,18 +61,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       return getPortionByImportance(txtObj.text, txtObj.importance as "high" | "medium" | "low");
     });
     
-    const typingText = shuffle(selectedTexts).join(" ");
-    
-    let combined = "";
-    const segments: TextSegment[] = [];
-
-    typingText.forEach((t) => {
-      const norm = normalizeForTyping(t.text);
-      const start = combined.length;
-      combined += (combined ? " " : "") + norm;
-      const end = combined.length - 1;
-      segments.push({ textId: t.id, start, end });
-    });
+    const typingText = shuffle(selectedTexts).join(" ").trim();
 
     progressRef.current = 0;
     statsRef.current = {
@@ -82,12 +75,11 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
 
     setState({
       mode: "group",
-      typingText: combined,
+      typingText: typingText,
       progress: 0,
       startedAt: Date.now(),
       finishedAt: undefined,
-      source: { type: "group", id: group.id },
-      segments: segments
+      source: { type: "group", id: group.id, name: group.name },
     });
   };
 
@@ -131,27 +123,6 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       statsRef.current.completed = true;
       statsRef.current.finalWpm = getCurrentStats()?.wpm;
     }
-  };
-
-  const getCurrentTextName = (): string | null => {
-    if (state.mode === "text") {
-      const text = library.texts.find(t => t.id === state.source?.id);
-      return text?.title ?? null;
-    }
-
-    if (state.mode === "group" && state.segments) {
-      const currentIndex = Math.round(
-        (progressRef.current / 100) * state.typingText.length
-      );
-      const seg = state.segments.find(
-        s => currentIndex >= s.start && currentIndex <= s.end
-      );
-      if (!seg) return null;
-      const text = library.texts.find(t => t.id === seg.textId);
-      return text?.title ?? null;
-    }
-
-    return null;
   };
 
   const getCurrentStats = () => {
@@ -208,7 +179,6 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
         updateProgress,
         completeRound,
         progressRef,
-        getCurrentTextName,
         statsRef,
         getCurrentStats,
         pause,

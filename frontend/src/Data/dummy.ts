@@ -8,5 +8,4 @@ He built late into the nights, not knowing whether anyone would ever use his wor
 And in those nights, he found love too - a love that was patient, gentle, but fleeting. 
 One day, the code kept running, but she did not return. 
 He realized that not all bugs can be fixed, not all stories end the way we imagine. 
-Yet still, he typed, line after line, because building was the only way he knew how to love the world.
-`);
+Yet still, he typed, line after line, because building was the only way he knew how to love the world`);

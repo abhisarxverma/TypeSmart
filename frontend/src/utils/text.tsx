@@ -51,3 +51,30 @@ export function normalizeForTyping(input: string): string {
 export function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
+
+export function chunkAndShuffle(text: string, wordsPerChunk: number = 30): string {
+  const words = text.split(/\s+/); // split by whitespace
+  const chunks: string[] = [];
+
+  for (let i = 0; i < words.length; i += wordsPerChunk) {
+    chunks.push(words.slice(i, i + wordsPerChunk).join(" "));
+  }
+
+  const shuffled = chunks.sort(() => Math.random() - 0.5);
+
+  return shuffled.join(" ");
+}
+
+export function sentenceShuffle(text: string): string {
+  const sentences = text.split(/([.?!])\s+/).reduce((acc, part, idx, arr) => {
+    if (/[.?!]/.test(part) && arr[idx + 1]) {
+      acc[acc.length - 1] += part; // attach punctuation
+    } else {
+      acc.push(part);
+    }
+    return acc;
+  }, [] as string[]);
+
+  const shuffled = sentences.sort(() => Math.random() - 0.5);
+  return shuffled.join(" ");
+}

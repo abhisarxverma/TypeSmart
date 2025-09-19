@@ -3,6 +3,7 @@ import { useRef, memo, useEffect, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import clsx from "clsx";
 import { useTyping } from "../../../Hooks/useTyping"
+import toast from "react-hot-toast";
 
 type Status = "pending" | "correct" | "incorrect" | "current";
 
@@ -171,7 +172,9 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
       applyStatus(i + 1, "current");
       currentIndexRef.current = i + 1;
     } else {
+      toast.success("Completed")
       currentIndexRef.current = i;
+      updateProgress(characters.length, characters.length);
       completeRound()
     }
 
