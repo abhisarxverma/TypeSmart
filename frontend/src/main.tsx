@@ -13,10 +13,10 @@ import TypingProvider from './Contexts/TypingProvider.tsx'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false, 
+      refetchOnWindowFocus: false,
     },
   },
-})   
+})
 
 persistQueryClient({
   queryClient,
@@ -30,7 +30,7 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <LibraryProvider>
             <TypingProvider>
-                <App />
+              <App />
             </TypingProvider>
           </LibraryProvider>
         </AuthProvider>

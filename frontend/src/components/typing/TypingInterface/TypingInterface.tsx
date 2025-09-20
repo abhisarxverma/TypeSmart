@@ -1,4 +1,3 @@
-
 import { useRef, memo, useEffect, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import clsx from "clsx";
@@ -54,13 +53,11 @@ const Char = memo(
 type LineInfo = { start: number; end: number; top: number };
 
 export default function TypingInterface({ containerRef }: { containerRef?: React.RefObject<HTMLDivElement | null> }) {
-  const { state, updateProgress, statsRef, resume, getCurrentStats, completeRound } = useTyping();
+  const { state, updateProgress, statsRef, resume, completeRound, currentIndexRef, statusRef, pause } = useTyping();
   const typingText = state.typingText;
   const characters = typingText.split("");
 
   const spanRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const currentIndexRef = useRef(0);
-  const statusRef = useRef<Status[]>([]);
 
   const left = useMotionValue(0);
   const top = useMotionValue(1);
@@ -68,15 +65,7 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
   const [windowStartLine, setWindowStartLine] = useState(0);
   const [lineMap, setLineMap] = useState<LineInfo[]>([]);
 
-  useEffect(() => {
-    let frame: number;
-    const tick = () => {
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [getCurrentStats]);
-
+  // Remove the infinite loop useEffect - it's not needed!
 
   const applyStatus = (index: number, status: Status) => {
     statusRef.current[index] = status;
@@ -105,7 +94,6 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
     animate(top, y, { type: "spring", stiffness: 300, damping: 30 });
   };
 
-  // --- NEW: rebuild line map when spans layout changes ---
   const rebuildLineMap = () => {
     const lines: LineInfo[] = [];
     let currentLine: LineInfo | null = null;
@@ -201,43 +189,86 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
   };
 
   useEffect(() => {
-    statusRef.current = Array(characters.length).fill("pending");
-    if (characters.length > 0) statusRef.current[0] = "current";
-    setWindowStartLine(0);
+    if (statusRef.current.length !== characters.length || statusRef.current.length === 0) {
+      statusRef.current = Array(characters.length).fill("pending");
+
+      if (characters.length > 0) {
+        const currentIndex = currentIndexRef.current;
+        if (currentIndex < characters.length) {
+          statusRef.current[currentIndex] = "current";
+        } else if (currentIndex === 0) {
+          statusRef.current[0] = "current";
+        }
+      }
+
+      setWindowStartLine(0);
+    }
   }, [typingText]);
 
-  // rebuild line map after layout
+  // Rebuild line map after layout
   useLayoutEffect(() => {
     rebuildLineMap();
   }, [characters.length, typingText]);
 
   useLayoutEffect(() => {
+    updateWindowForIndex(currentIndexRef.current);
     moveCursorToIndex(currentIndexRef.current);
-  }, [windowStartLine, characters.length]);
+  }, [windowStartLine, characters.length, lineMap]);
 
   useEffect(() => {
-    // reset typing interface when new round starts
-    currentIndexRef.current = 0;
-    statusRef.current = Array(characters.length).fill("pending");
-    if (characters.length > 0) {
-      statusRef.current[0] = "current";
-    }
-    setWindowStartLine(0);
+    const isNewRound = state.startedAt && (
+      state.progress === 0 &&
+      currentIndexRef.current === 0 &&
+      !statsRef.current.completed
+    );
 
-    // move caret to start
-    requestAnimationFrame(() => {
-      moveCursorToIndex(0);
-    });
-  }, [state.startedAt, characters.length]);
+    if (isNewRound) {
+      currentIndexRef.current = 0;
+      statusRef.current = Array(characters.length).fill("pending");
+      if (characters.length > 0) {
+        statusRef.current[0] = "current";
+      }
+      setWindowStartLine(0);
+
+      requestAnimationFrame(() => {
+        moveCursorToIndex(0);
+      });
+    } else {
+      requestAnimationFrame(() => {
+        moveCursorToIndex(currentIndexRef.current);
+      });
+    }
+  }, [typingText]);
 
   useEffect(() => {
     if (containerRef?.current) {
-      containerRef?.current.focus();
+      containerRef.current.focus();
     }
-  }, [state.startedAt, typingText]);
+  }, [typingText]);
+
+  useLayoutEffect(() => {
+    requestAnimationFrame(() => {
+      statusRef.current.forEach((status, index) => {
+        const el = spanRefs.current[index];
+        if (el && status) {
+          el.className = `${STATUS_CLASS[status]} transition-colors duration-150`;
+        }
+      });
+
+      moveCursorToIndex(currentIndexRef.current);
+    });
+  }, [characters.length, lineMap]);
+
+  useEffect(() => {
+    const statsRefCopy = statsRef.current
+    return () => {
+      if (!statsRefCopy.isPaused && !statsRefCopy.completed) {
+        pause();
+      }
+    };
+  }, []);
 
 
-  // --- Visible slice calculation (by line) ---
   const { lines, overscan } = WINDOW;
   const startLine = Math.max(0, windowStartLine - overscan);
   const endLine = Math.min(lineMap.length - 1, windowStartLine + lines + overscan - 1);
@@ -274,7 +305,6 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
               spanRef={(el) => {
                 spanRefs.current[globalIndex] = el;
               }}
-              // currentStyle={currentStyle}
             />
           );
         })}

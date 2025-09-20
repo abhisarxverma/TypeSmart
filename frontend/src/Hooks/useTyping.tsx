@@ -1,6 +1,7 @@
-"use client";
-import { createContext, useContext } from "react";
+import React, { createContext, useContext } from "react";
 import type { Text, Group } from "@/Types/Library";
+
+export type Status = "pending" | "correct" | "incorrect" | "current";
 
 export interface TextSegment {
   textId: string;
@@ -41,6 +42,8 @@ interface TypingContextType {
   completeRound: () => void;
   progressRef : React.RefObject<number>
   statsRef : React.RefObject<StatsRefObject>;
+  currentIndexRef: React.RefObject<number>;
+  statusRef: React.RefObject<Status[]>;
   getCurrentStats: () => Stats;
   pause: () => void;
   resume: () => void;
