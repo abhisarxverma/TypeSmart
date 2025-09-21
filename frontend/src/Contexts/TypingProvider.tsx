@@ -3,7 +3,6 @@ import { dummyText } from "@/Data/dummy";
 import type { Text, Group } from "@/Types/Library";
 import { chunkAndShuffle, normalizeForTyping } from "@/utils/text";
 import { TypingContext, type StatsRefObject, type Status, type TypingState } from "@/Hooks/useTyping";
-import { useLibrary } from "@/Hooks/useLibrary";
 import { getPortionByImportance, shuffle } from "@/utils/group";
 import { initializeStatuses } from "@/utils/typing";
 
@@ -14,8 +13,6 @@ const defaultState: TypingState = {
 };
 
 export default function TypingProvider({ children }: { children: ReactNode }) {
-
-  const { library } = useLibrary();
 
   const [state, setState] = useState<TypingState>(defaultState);
 
@@ -31,28 +28,27 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   });
 
   const currentIndexRef = useRef<number>(0);
-  
+
   const statusRef = useRef<Status[]>(initializeStatuses(dummyText));
 
-  const startText = (text: Text) => {
+  function startText(text: Text) {
     let typingText = normalizeForTyping(text.text);
     typingText = chunkAndShuffle(typingText);
 
-    // Reset all refs for new text
     progressRef.current = 0;
     currentIndexRef.current = 0;
-    
+
     statsRef.current = {
       correct: 0,
       incorrect: 0,
-      startedAt: 0, // Will be set on first keypress
+      startedAt: 0,
       elapsedPaused: 0,
       isPaused: false,
       completed: false
     };
-    
+
     statusRef.current = initializeStatuses(typingText);
-    
+
     setState({
       mode: "text",
       typingText: typingText,
@@ -70,19 +66,18 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
 
     const typingText = shuffle(selectedTexts).join(" ").trim();
 
-    // Reset all refs for new group
     progressRef.current = 0;
     currentIndexRef.current = 0;
-    
+
     statsRef.current = {
       correct: 0,
       incorrect: 0,
-      startedAt: 0, // Will be set on first keypress
+      startedAt: 0,
       elapsedPaused: 0,
       isPaused: false,
       completed: false
     };
-    
+
     statusRef.current = initializeStatuses(typingText);
 
     setState({
@@ -96,46 +91,33 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   };
 
   const resetRound = () => {
-    // Reset progress and stats but keep current text
     progressRef.current = 0;
     currentIndexRef.current = 0;
-    
+
     statsRef.current = {
       correct: 0,
       incorrect: 0,
-      startedAt: 0, // Will be set on first keypress
+      startedAt: 0,
       elapsedPaused: 0,
       isPaused: false,
       completed: false,
       finalWpm: undefined
     };
-    
-    // Reinitialize status array for current text
+
     statusRef.current = initializeStatuses(state.typingText);
-    
-    if (state.source?.type === "text") {
-      const text = library.texts.find(t => t.id === state.source?.id);
-      if (text) {
-        startText(text);
-      }
-    } else if (state.source?.type === "group") {
-      const group = library.groups.find(g => g.id === state.source?.id);
-      if (group) {
-        startGroup(group);
-      }
-    } else {
-      setState({
-        ...defaultState,
-        startedAt: Date.now()
-      });
-      statusRef.current = initializeStatuses(dummyText);
-    }
+
+    setState(prev => ({
+      ...prev,
+      progress: 0,
+      startedAt: Date.now(),
+      finishedAt: undefined,
+    }));
   };
 
   const updateProgress = (index: number, total: number) => {
     const newProgress = Math.round((index / total) * 100);
     progressRef.current = newProgress;
-    
+
     if (Math.abs(state.progress - newProgress) >= 1) {
       setState(prev => ({ ...prev, progress: newProgress }));
     }
@@ -144,7 +126,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   const completeRound = () => {
     statsRef.current.completed = true;
     statsRef.current.finalWpm = getCurrentStats()?.wpm;
-    
+
     setState((prev) => ({
       ...prev,
       progress: 100,

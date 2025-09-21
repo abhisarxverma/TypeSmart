@@ -53,7 +53,7 @@ export function countWords(text: string) {
 }
 
 export function chunkAndShuffle(text: string, wordsPerChunk: number = 30): string {
-  const words = text.split(/\s+/); // split by whitespace
+  const words = text.split(/\s+/); 
   const chunks: string[] = [];
 
   for (let i = 0; i < words.length; i += wordsPerChunk) {
@@ -68,7 +68,7 @@ export function chunkAndShuffle(text: string, wordsPerChunk: number = 30): strin
 export function sentenceShuffle(text: string): string {
   const sentences = text.split(/([.?!])\s+/).reduce((acc, part, idx, arr) => {
     if (/[.?!]/.test(part) && arr[idx + 1]) {
-      acc[acc.length - 1] += part; // attach punctuation
+      acc[acc.length - 1] += part; 
     } else {
       acc.push(part);
     }

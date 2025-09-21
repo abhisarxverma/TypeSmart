@@ -19,7 +19,6 @@ export type WindowConfig = {
   edgePadding: number; // when caret is this many lines from top/bottom, shift
 };
 
-// Default: 3 lines window
 const WINDOW: WindowConfig = {
   lines: 3,
   overscan: 1,
@@ -64,8 +63,6 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
 
   const [windowStartLine, setWindowStartLine] = useState(0);
   const [lineMap, setLineMap] = useState<LineInfo[]>([]);
-
-  // Remove the infinite loop useEffect - it's not needed!
 
   const applyStatus = (index: number, status: Status) => {
     statusRef.current[index] = status;
@@ -232,13 +229,15 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
 
       requestAnimationFrame(() => {
         moveCursorToIndex(0);
+        updateWindowForIndex(0)
       });
     } else {
       requestAnimationFrame(() => {
         moveCursorToIndex(currentIndexRef.current);
       });
     }
-  }, [typingText]);
+  }, [state.startedAt, typingText]);
+
 
   useEffect(() => {
     if (containerRef?.current) {
@@ -267,6 +266,7 @@ export default function TypingInterface({ containerRef }: { containerRef?: React
       }
     };
   }, []);
+
 
 
   const { lines, overscan } = WINDOW;

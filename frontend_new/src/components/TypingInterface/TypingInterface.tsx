@@ -85,6 +85,7 @@ export default function TypingInterface() {
   const moveCursorToIndex = (i: number) => {
     const container = containerRef.current;
     const span = spanRefs.current[clampIndex(i)];
+
     if (!container || !span) return;
 
     const containerRect = container.getBoundingClientRect();
