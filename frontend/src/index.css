@@ -34,7 +34,6 @@ img {
   background-color: var(--foreground);
 }
 
-/* Firefox */
 .scrollbar-custom {
   scrollbar-width: thin;
   scrollbar-color: var(--muted-foreground) transparent;

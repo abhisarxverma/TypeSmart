@@ -5,12 +5,12 @@ import { useAuth } from "./Hooks/useAuth";
 import { LucideLoaderCircle } from "lucide-react";
 import { ProtectedRoute } from "./utils/protection";
 import AuthPage from "./pages/auth/AuthPage";
-import DemoApp from "./apps/DemoApp";
 import AddText from "./pages/main/AddText";
 import TextDetails from "./pages/main/TextDetails";
 import EditText from "./pages/main/EditText";
 import GroupDetails from "./pages/main/GroupDetails";
 import TypingPage from "./pages/typing/TypingPage";
+import ModeProvider from "./Contexts/ModeProvider";
 
 export default function App() {
 
@@ -26,7 +26,9 @@ export default function App() {
     <Routes>
       <Route path="/app" element={
         <ProtectedRoute>
-          <MainApp />
+          <ModeProvider mode="main">
+              <MainApp />
+          </ModeProvider>
         </ProtectedRoute>
       }>
         <Route path="library" element={<Library />} />
@@ -38,10 +40,17 @@ export default function App() {
       </Route>
 
 
-      <Route path="/demo" element={<DemoApp />}>
+      <Route path="/demo" element={
+        <ModeProvider mode="demo">
+            <MainApp />
+        </ModeProvider>
+        }>
         <Route path="library" element={
           <Library />
         } />
+        <Route path="typing" element={<TypingPage />} />
+        <Route path="library/text/:id" element={<TextDetails />} />
+        <Route path="library/group/:id" element={<GroupDetails />} />
       </Route>
 
       <Route path="/login-signup" element={<AuthPage />} />

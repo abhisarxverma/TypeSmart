@@ -1,18 +1,31 @@
 import { Button } from "@/components/ui/button";
-import { FaLayerGroup, FaPlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa6";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import TextsList from "@/components/library/TextsList";
 import GroupsList from "@/components/library/GroupsList";
 import { useLibrary } from "@/Hooks/useLibrary";
 import { Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NewGroupDialog from "@/components/library/NewGroupDialog";
+import { useMode } from "@/Hooks/useMode";
+import { useProtectFeature } from "@/utils/protection";
+import { giveAddTextRoute } from "@/utils/routing";
 
 export default function Library() {
 
     const { library, isFetchingLibrary } = useLibrary();
 
+    const navigate = useNavigate();
+    const { mode } = useMode();
+
     console.log("LIBRARY : ", library);
+
+    function navigateToAddText() {
+        navigate(giveAddTextRoute());
+    }
+
+    const handleAddTextClick = useProtectFeature(navigateToAddText, mode);
+
 
     if (isFetchingLibrary) {
         return (
@@ -30,10 +43,8 @@ export default function Library() {
                     <NewGroupDialog>
                         <Button variant="ghost"><FaPlus /><span className="font-semibold">New group</span></Button>
                     </NewGroupDialog>
-                    <Button variant="ghost" asChild>
-                        <Link to="/app/add-text">
-                            <FaPlus /><span className="font-semibold">New text</span>
-                        </Link>
+                    <Button variant="ghost" onClick={handleAddTextClick}>
+                        <FaPlus /><span className="font-semibold">New text</span>
                     </Button>
                 </div>
             </div>

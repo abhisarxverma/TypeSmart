@@ -5,14 +5,29 @@ import { chunkAndShuffle, normalizeForTyping } from "@/utils/text";
 import { TypingContext, type StatsRefObject, type Status, type TypingState } from "@/Hooks/useTyping";
 import { getPortionByImportance, shuffle } from "@/utils/group";
 import { initializeStatuses } from "@/utils/typing";
+import { useMode } from "@/Hooks/useMode";
+import { DEMO_LIBRARY } from "@/Data/DemoLibraryData";
 
-const defaultState: TypingState = {
-  mode: "idle",
-  typingText: dummyText,
-  progress: 0
-};
+function getRandomDemoText() {
+  const texts = DEMO_LIBRARY.texts;
+  return texts[Math.floor(Math.random() * texts.length)];
+}
+
 
 export default function TypingProvider({ children }: { children: ReactNode }) {
+  
+  const { mode } = useMode();
+  
+  const defaultTypingText =
+    mode === "demo"
+      ? getRandomDemoText().text
+      : dummyText;
+  
+  const defaultState: TypingState = {
+    mode: "idle",
+    typingText: defaultTypingText,
+    progress: 0
+  };
 
   const [state, setState] = useState<TypingState>(defaultState);
 

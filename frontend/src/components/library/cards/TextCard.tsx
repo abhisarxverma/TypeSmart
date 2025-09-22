@@ -4,11 +4,14 @@ import { FaHashtag } from "react-icons/fa";
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { giveTextDetailsRoute } from "@/utils/routing";
+import { useMode } from "@/Hooks/useMode";
 
 function TextCard({ text } : { text : Text }) {
 
+    const { mode } = useMode();
+
     const navigate = useNavigate();
-    const detailsRoute = giveTextDetailsRoute(text.id);
+    const detailsRoute = giveTextDetailsRoute(text.id, mode);
 
     return (
         <div onClick={() => navigate(detailsRoute)} className="relative cursor-pointer min-h-[145px] p-5 rounded-lg border-1 border-border bg-card-dark flex flex-col justify-between transition-all duration-300 hover:bg-card">

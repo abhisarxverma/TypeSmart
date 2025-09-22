@@ -1,15 +1,16 @@
 import type { Group } from "@/Types/Library";
 import { timeAgo } from "@/utils/text";
 import { memo } from "react";
-import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { FaHashtag, FaLayerGroup } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { giveGroupDetailsRoute } from "@/utils/routing";
+import { useMode } from "@/Hooks/useMode";
 
 function GroupCard({ group }: { group: Group }) {
 
     const navigate = useNavigate();
-    const groupDetailsRoute = giveGroupDetailsRoute(group.id);
+    const { mode } = useMode();
+    const groupDetailsRoute = giveGroupDetailsRoute(group.id, mode);
 
     return (
         <div onClick={() => navigate(groupDetailsRoute)} className="relative min-h-[145px] p-5 rounded-lg border-1 border-border bg-card-dark flex flex-col justify-between transition-all duration-300 hover:bg-card cursor-pointer">

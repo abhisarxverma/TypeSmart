@@ -14,8 +14,14 @@ import DeleteButton from "@/components/library/DeleteButton";
 import { useTyping } from "@/Hooks/useTyping";
 import { giveTypingPageRoute } from "@/utils/routing";
 import toast from "react-hot-toast";
+import { useMode } from "@/Hooks/useMode";
+import type { Group } from "@/Types/Library";
+import { DEMO_LIBRARY } from "@/Data/DemoLibraryData";
+import { useProtectFeature } from "@/utils/protection";
 
 export default function GroupDetails() {
+
+    const { mode } = useMode();
 
     const { id: groupId } = useParams();
 
@@ -25,11 +31,15 @@ export default function GroupDetails() {
 
     const { deleteGroup, isDeletingGroup } = useDeleteGroupMutation(groupId ?? "");
 
+    const handleDeleteClick = useProtectFeature(deleteGroup, mode);
+
     const navigate = useNavigate();
 
     if (isFetchingLibrary) return <LoaderPage />
 
-    const group = library.groups.find(grp => grp.id === groupId);
+    let group: Group | undefined;
+    if (mode === "main") group = library.groups.find(grp => grp.id === groupId);
+    else group = DEMO_LIBRARY.groups.find(grp => grp.id === groupId);
 
     if (!groupId || !group) return <NotFound text="Group not found" />
 
@@ -40,7 +50,7 @@ export default function GroupDetails() {
             return;
         }
         startGroup(group);
-        navigate(giveTypingPageRoute());
+        navigate(giveTypingPageRoute(mode));
     }
 
     return (
@@ -55,7 +65,7 @@ export default function GroupDetails() {
                     <AddTextDialog group={group}>
                         <Button variant="ghost"><FaPlus /> Add Text</Button>
                     </AddTextDialog>
-                    <DeleteButton deleteFn={deleteGroup} isDeleting={isDeletingGroup} />
+                    <DeleteButton deleteFn={handleDeleteClick} isDeleting={isDeletingGroup} />
                 </div>
             </div>
             <p className="text-section-title text-muted-foreground mt-10"><span className="">{group.group_texts.length}</span> {"Text" + (group.group_texts.length <= 1 ? "" : "s")} </p>

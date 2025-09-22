@@ -13,18 +13,23 @@ import { FaHashtag } from "react-icons/fa6"
 import { useCreateGroupMutation } from "@/Hooks/useBackend"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
+import { useProtectFeature } from "@/utils/protection"
+import { useMode } from "@/Hooks/useMode"
 
 export default function NewGroupDialog({ children }:{ children: React.ReactNode }) {
+    const { mode } = useMode();
 
     const [ name, setName ] = useState<string>("");
     const [ tag, setTag ] = useState<string>("");
 
     const { createGroup, isCreatingGroup } = useCreateGroupMutation({ name, tag });
 
-    function handleCreation() {
+    function handleGroupCreation() {
         if (isCreatingGroup || !name || !tag) return;
         createGroup();
     }
+
+    const protectedCreation = useProtectFeature(handleGroupCreation, mode);
 
     return (
         <Dialog>
@@ -51,7 +56,7 @@ export default function NewGroupDialog({ children }:{ children: React.ReactNode 
                                     </div>
                                 </div>
                             </div>
-                            <Button onClick={handleCreation} variant="secondary">{isCreatingGroup? <Loader2 className="animate-spin" /> : "Create Group"}</Button>
+                            <Button onClick={protectedCreation} variant="secondary">{isCreatingGroup? <Loader2 className="animate-spin" /> : "Create Group"}</Button>
                         </div>
                     </DialogDescription>
                 </DialogHeader>
