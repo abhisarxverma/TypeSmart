@@ -1,14 +1,16 @@
 
-export function giveLibraryRoute() {
-    return "/app/library";
+export function giveLibraryRoute(mode: "main" | "demo") {
+    if (mode === "main") return "/app/library";
+    return "/demo/library";
 }
 
 export function giveAddTextRoute() {
     return "/app/library/add-text";
 }
 
-export function giveEditTextRoute(textId: string) {
-    return "/app/library/edit-text/"+textId;
+export function giveEditTextRoute(textId: string, mode: "main" | "demo") {
+    if (mode === "main") return "/app/library/edit-text/"+textId;
+    return "/demo/library/edit-text/"+textId;
 }
 
 export function giveTextDetailsRoute(textId: string, mode: string) {

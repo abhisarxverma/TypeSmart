@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useLibrary } from "@/Hooks/useLibrary";
 import { Loader2 } from "lucide-react";
 import { FaPencil } from "react-icons/fa6";
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { giveEditTextRoute, giveTypingPageRoute } from "@/utils/routing";
+import { useNavigate, useParams } from "react-router-dom"
+import { giveEditTextRoute, giveLibraryRoute, giveTypingPageRoute } from "@/utils/routing";
 import { FaRegKeyboard } from "react-icons/fa";
 import { getPresentInGroups } from "@/utils/files";
 import PresentInGroups from "@/components/library/TextDetails/PresentInGroups";
@@ -14,7 +14,6 @@ import { useTyping } from "@/Hooks/useTyping";
 import { useMode } from "@/Hooks/useMode";
 import { DEMO_LIBRARY } from "@/Data/DemoLibraryData";
 import type { Text } from "@/Types/Library";
-import { useProtectFeature } from "@/utils/protection";
 
 export default function TextDetails() {
 
@@ -29,9 +28,17 @@ export default function TextDetails() {
     
     const { deleteText, isDeletingText } = useDeleteTextMutation(textId ?? "");
 
-    const handleDelete = useProtectFeature(deleteText, mode);
+    function handleDelete() {
+        if ( mode === "main" ) deleteText();
+        else {
+            library.texts = library.texts.filter(txt => txt.id !== textId);
+            navigate(giveLibraryRoute(mode))
+        };
+    }
 
-    const handleEditClick = useProtectFeature(() => navigate(giveEditTextRoute(textId ?? "")), mode);
+    function handleEditClick() {
+        navigate(giveEditTextRoute(textId ?? "", mode));
+    }
 
     let text : Text | undefined;
     if (mode === "main") text = library.texts.find((txt) => txt.id === textId);
@@ -56,8 +63,6 @@ export default function TextDetails() {
         startText(text);
         navigate(giveTypingPageRoute(mode));
     }
-
-    const editDetailsRoute = giveEditTextRoute(textId);
 
     const presentInGroups = getPresentInGroups(text.id, library.groups);
 

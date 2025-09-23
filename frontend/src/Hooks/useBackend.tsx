@@ -4,6 +4,7 @@ import { giveGroupDetailsRoute, giveLibraryRoute, giveTextDetailsRoute } from "@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useMode } from "./useMode";
 
 export function useGetRealUserQuery(token: string | null) {
 
@@ -87,7 +88,8 @@ export function useAddTextMutation({ text, title, tag }: { text: string, tag: st
 export function useEditTextMutation({ text, title, tag, textId }: { text: string, tag: string, title: string, textId: string }) {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const textDetailsRoute = giveTextDetailsRoute(textId);
+    const { mode } = useMode()
+    const textDetailsRoute = giveTextDetailsRoute(textId, mode);
 
     const { mutate: editText, isPending: isEditingText } = useMutation({
         mutationFn: async () => {
@@ -285,7 +287,7 @@ export function useCreateGroupMutation({ name, tag }: { name: string, tag: strin
 
 }
 
-export function useDeleteTextMutation( textId : string ) {
+export function useDeleteTextMutation(textId: string) {
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -314,11 +316,12 @@ export function useDeleteTextMutation( textId : string ) {
 
 }
 
-export function useDeleteGroupMutation( groupId : string ) {
+export function useDeleteGroupMutation(groupId: string) {
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const libraryRoute = giveLibraryRoute();
+    const { mode } = useMode();
+    const libraryRoute = giveLibraryRoute(mode);
 
     const { mutate: deleteGroup, isPending: isDeletingGroup } = useMutation({
         mutationFn: async () => {
@@ -331,7 +334,7 @@ export function useDeleteGroupMutation( groupId : string ) {
             return data;
         },
         onError: (error) => {
-            console.log("Error in delete group mutation : ", {groupId, error});
+            console.log("Error in delete group mutation : ", { groupId, error });
             toast.error(error.message);
         },
         onSuccess: () => {
@@ -342,4 +345,25 @@ export function useDeleteGroupMutation( groupId : string ) {
 
     return { deleteGroup, isDeletingGroup };
 
+}
+
+export function useSendFeedbackMutation(text: string) {
+
+    const { mutate: sendFeedback, isPending: isSendingFeedback } = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/misc/send_feedback", {
+                text
+            });
+            const data = res.data;
+            console.log("send feedback result : ", data);
+            if (data.error) throw new Error(data.error);
+            return data;
+        },
+        onError: (error) => {
+            console.log("Error in send feedback mutation: ", error);
+            toast.error(error.message);
+        }
+    });
+
+    return { sendFeedback, isSendingFeedback };
 }

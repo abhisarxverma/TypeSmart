@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import userRoutes from "./Routes/library.routes.js";
 import authRoutes from "./Routes/auth.routes.js";
+import miscRoutes from "./Routes/misc.routes.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/library", userRoutes);
 app.use("/api/auth", authRoutes)
+app.use("/api/misc", miscRoutes)
 
 const port = process.env.PORT || 5000;
 

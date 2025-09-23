@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 
 interface LibraryContextType {
     library: Library,
+    setLibrary: React.Dispatch<React.SetStateAction<Library>> | undefined
     isFetchingLibrary: boolean
 }
 

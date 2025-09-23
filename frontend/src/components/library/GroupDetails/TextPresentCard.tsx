@@ -12,9 +12,10 @@ import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { giveEditTextRoute, giveTextDetailsRoute } from "@/utils/routing";
 import { useNavigate } from "react-router-dom";
-import { RiArrowRightSLine } from "react-icons/ri";
 import { useRemoveTextFromGroupMutation, useUpdateImportanceMutation } from "@/Hooks/useBackend";
 import { Loader2 } from "lucide-react";
+import { useMode } from "@/Hooks/useMode";
+import { useLibrary } from "@/Hooks/useLibrary";
 
 export default function TextPresentCard({ text, groupId }: { text: TextInGroup, groupId: string }) {
 
@@ -24,6 +25,9 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
     const { removeFromGroup, isRemovingFromGroup } = useRemoveTextFromGroupMutation({ textId: text.id, groupId });
 
     const navigate = useNavigate();
+
+    const { mode } = useMode();
+    const { library, setLibrary } = useLibrary();
 
     useEffect(() => {
         setImportance(text.importance ?? "medium")
@@ -35,18 +39,46 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
     else if (importance === "high") importanceColor = "text-red-400";
     else importanceColor = "text-green-300";
 
-    const textDetailsRoute = giveTextDetailsRoute(text.id);
-    const editDetailsRoute = giveEditTextRoute(text.id);
+    const textDetailsRoute = giveTextDetailsRoute(text.id, mode);
+    const editDetailsRoute = giveEditTextRoute(text.id, mode);
 
     function handleImportanceChange(value:string) {
-        if (isUpdatingImportance) return;
+        if ( mode === "main" ){
+            if (isUpdatingImportance) return;
+            updateImportance()
+        }
+        else {
+            text.importance = value;
+            const groupToUpdate = library.groups.find(grp => grp.id === groupId)
+            if (!groupToUpdate) return;
+            groupToUpdate.group_texts.map(txt => {
+                if (txt.id === text.id) return text
+                else return txt
+            })
+            const updatedGroups = library.groups.map(grp => {
+                if ( grp.id === groupId ) return groupToUpdate
+                else return grp
+            })
+            if (setLibrary) setLibrary({...library, groups: updatedGroups})
+        }
         setImportance(value);
-        updateImportance()
     }
 
     function handleRemove() {
-        if (isRemovingFromGroup) return;
-        removeFromGroup();
+        if (mode === "main") {
+            if (isRemovingFromGroup) return;
+            removeFromGroup();
+        }
+        else {
+            const groupToUpdate = library.groups.find(grp => grp.id === groupId);
+            if (!groupToUpdate) return;
+            groupToUpdate.group_texts = groupToUpdate.group_texts.filter(txt => txt.id !== text.id)
+            const updatedGroups = library.groups.map(grp => {
+                if ( grp.id === groupId ) return groupToUpdate
+                else return grp
+            })
+            if (setLibrary) setLibrary({...library, groups: updatedGroups })
+        }
     }
 
     return (

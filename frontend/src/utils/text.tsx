@@ -52,7 +52,7 @@ export function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
-export function chunkAndShuffle(text: string, wordsPerChunk: number = 30): string {
+export function chunkAndShuffle(text: string, wordsPerChunk: number = 100): string {
   const words = text.split(/\s+/); 
   const chunks: string[] = [];
 

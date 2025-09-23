@@ -4,6 +4,8 @@ import { AuthContext } from '@/Hooks/useAuth.tsx';
 import api from '../lib/axios.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetRealUserQuery } from '@/Hooks/useBackend.tsx';
+import { useNavigate } from 'react-router-dom';
+import { giveTypingPageRoute } from '@/utils/routing.tsx';
 
 function AuthProvider({ children }: { children: ReactNode }) {
 
@@ -11,6 +13,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const [hasCheckedAuth, setHasCheckedAuth] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { user, isGettingUser, refetch } = useGetRealUserQuery(token);
 
@@ -19,7 +22,9 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-    });
+      options: {
+        redirectTo: `${window.location.origin}/app/library`,
+      }});
     if (error) console.error('Error signing in:', error.message);
   };
 
@@ -28,12 +33,13 @@ function AuthProvider({ children }: { children: ReactNode }) {
       .then(() => {
         delete api.defaults.headers.common['Authorization'];
         setToken(null);
-        queryClient.removeQueries({queryKey: ["user"]});
+        queryClient.removeQueries({ queryKey: ["user"] });
         setHasCheckedAuth(true);
       })
       .catch((error) => {
         console.error("Error signing out:", error.message);
       });
+    navigate(giveTypingPageRoute("demo"))
   }
 
   useEffect(() => {
@@ -58,7 +64,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
       }
       setHasCheckedAuth(true);
     };
-    
+
     getUserAndSetToken();
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {

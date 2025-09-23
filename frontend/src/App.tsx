@@ -11,14 +11,16 @@ import EditText from "./pages/main/EditText";
 import GroupDetails from "./pages/main/GroupDetails";
 import TypingPage from "./pages/typing/TypingPage";
 import ModeProvider from "./Contexts/ModeProvider";
+import LandingPage from "./pages/LandingPage";
 
 export default function App() {
 
-  const { hasCheckedAuth, isGettingUser } = useAuth();
+  const { isGettingUser } = useAuth();
 
   if (isGettingUser) return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="h-screen flex items-center justify-center flex-col gap-1">
       <LucideLoaderCircle className="animate-spin text-5xl" />
+      <p>Please wait</p>
     </div>
   )
 
@@ -51,9 +53,12 @@ export default function App() {
         <Route path="typing" element={<TypingPage />} />
         <Route path="library/text/:id" element={<TextDetails />} />
         <Route path="library/group/:id" element={<GroupDetails />} />
+        <Route path="library/edit-text/:id" element={<EditText />} />
       </Route>
 
       <Route path="/login-signup" element={<AuthPage />} />
+
+      <Route path="/home" element={<LandingPage />} />
 
     </Routes>
   )

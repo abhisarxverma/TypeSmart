@@ -1,23 +1,42 @@
 import { Button } from "@/components/ui/button";
 import { useRemoveTextFromGroupMutation } from "@/Hooks/useBackend";
+import { useLibrary } from "@/Hooks/useLibrary";
+import { useMode } from "@/Hooks/useMode";
 import type { Group } from "@/Types/Library";
 import { giveGroupDetailsRoute } from "@/utils/routing";
 import { Loader2 } from "lucide-react";
 import { FaHashtag } from "react-icons/fa6";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
-import { RiArrowRightSLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 
 export default function PresentInGroupCard({ textId, group }: { textId: string, group: Group }) {
     
     const navigate = useNavigate();
-    const groupDetailsRoute = giveGroupDetailsRoute(group.id);
+    const { mode } = useMode();
+    const groupDetailsRoute = giveGroupDetailsRoute(group.id, mode);
+    const { library, setLibrary } = useLibrary();
 
     const { removeFromGroup, isRemovingFromGroup } = useRemoveTextFromGroupMutation({ textId, groupId: group.id });
     
     function handleRemove() {
-        if (isRemovingFromGroup) return;
-        removeFromGroup();
+        if ( mode === "main" ) {
+            if (isRemovingFromGroup) return;
+            removeFromGroup();
+        }
+        else {
+
+            const updatedGroups = library.groups.map(grp => {
+                if ( grp.id === group.id ) {
+                    return {
+                        ...grp,
+                        group_texts: group.group_texts.filter(txt => txt.id !== textId)
+                    }
+                }
+                else return grp
+            })
+
+            if (setLibrary) setLibrary({ ...library, groups: updatedGroups });
+        }
     }
 
     return (

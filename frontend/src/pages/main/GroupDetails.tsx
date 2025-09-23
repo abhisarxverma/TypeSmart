@@ -15,8 +15,6 @@ import { useTyping } from "@/Hooks/useTyping";
 import { giveTypingPageRoute } from "@/utils/routing";
 import toast from "react-hot-toast";
 import { useMode } from "@/Hooks/useMode";
-import type { Group } from "@/Types/Library";
-import { DEMO_LIBRARY } from "@/Data/DemoLibraryData";
 import { useProtectFeature } from "@/utils/protection";
 
 export default function GroupDetails() {
@@ -37,9 +35,7 @@ export default function GroupDetails() {
 
     if (isFetchingLibrary) return <LoaderPage />
 
-    let group: Group | undefined;
-    if (mode === "main") group = library.groups.find(grp => grp.id === groupId);
-    else group = DEMO_LIBRARY.groups.find(grp => grp.id === groupId);
+    const group = library.groups.find(grp => grp.id === groupId);
 
     if (!groupId || !group) return <NotFound text="Group not found" />
 

@@ -10,9 +10,9 @@ export function getPortionByImportance(
   if (len === 0) return "";
 
   let sizeNeeded = 0;
-  if (importance === "high") sizeNeeded = Math.max(1, Math.floor(len * 0.6));
-  if (importance === "medium") sizeNeeded = Math.max(1, Math.floor(len * 0.3));
-  if (importance === "low") sizeNeeded = Math.max(1, Math.floor(len * 0.1));
+  if (importance === "high") sizeNeeded = Math.max(1, Math.floor(len * 0.8));
+  if (importance === "medium") sizeNeeded = Math.max(1, Math.floor(len * 0.6));
+  if (importance === "low") sizeNeeded = Math.max(1, Math.floor(len * 0.4));
 
   const maxStart = len - sizeNeeded;
   const randomStart = getRandomIntInclusive(0, Math.max(0, maxStart));
