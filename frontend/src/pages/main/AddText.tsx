@@ -1,8 +1,6 @@
 
 import TextForm from "@/components/layouts/TextForm";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import FileReference from "@/components/uploaders/FileReference";
 import { useAddTextMutation } from "@/Hooks/useBackend";
 import { Loader2 } from "lucide-react";

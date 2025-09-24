@@ -45,7 +45,7 @@ export default function GroupDetails() {
             toast.error("Group is empty, please add text to type.");
             return;
         }
-        startGroup(group);
+        startGroup(group)
         navigate(giveTypingPageRoute(mode));
     }
 

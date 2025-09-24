@@ -26,6 +26,7 @@ export default function TextForm({ title, text, tag, setTitle, setText, setTag, 
             <div className="input-group col-span-2">
                 <label className="input-label">Text</label>
                 <Textarea
+                    spellCheck={false}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Edit your text here"

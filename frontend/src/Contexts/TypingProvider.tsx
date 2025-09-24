@@ -1,35 +1,69 @@
 import { useRef, useState, type ReactNode } from "react";
 import { dummyText } from "@/Data/dummy";
 import type { Text, Group } from "@/Types/Library";
-import { chunkAndShuffle, normalizeForTyping } from "@/utils/text";
+import { normalizeForTyping } from "@/utils/text";
 import { TypingContext, type StatsRefObject, type Status, type TypingState } from "@/Hooks/useTyping";
-import { getPortionByImportance, shuffle } from "@/utils/group";
-import { initializeStatuses } from "@/utils/typing";
+import { chunkAndShuffle, generateTypingTextFromGroup, initializeStatuses } from "@/utils/typing";
 import { useMode } from "@/Hooks/useMode";
 import { DEMO_LIBRARY } from "@/Data/DemoLibraryData";
+import { getLastTyped, saveAsLastTyped } from "@/utils/localStorage";
+import { useLibrary } from "@/Hooks/useLibrary";
 
 function getRandomDemoText() {
   const texts = DEMO_LIBRARY.texts;
   return texts[Math.floor(Math.random() * texts.length)];
 }
 
-
 export default function TypingProvider({ children }: { children: ReactNode }) {
-  
+
   const { mode } = useMode();
-  
+
+  const { library } = useLibrary();
+
   const defaultTypingText =
     mode === "demo"
       ? getRandomDemoText().text
       : dummyText;
-  
-  const defaultState: TypingState = {
+
+  let defaultState: TypingState = {
     mode: "idle",
     typingText: defaultTypingText,
     progress: 0
   };
 
+  const lastTyped = getLastTyped();
+
+  if (lastTyped) {
+    const type = lastTyped.type;
+    const lastTypedId = lastTyped.id;
+    if (type === 'text') {
+      const lastTypedText = library.texts.find(txt => txt.id === lastTypedId);
+      if (lastTypedText) defaultState = {
+        mode: "text",
+        typingText: lastTypedText.text,
+        progress: 0,
+        startedAt: Date.now(),
+        finishedAt: undefined,
+        source: { type: "text", id: lastTypedText.id, name: lastTypedText.title },
+      }
+    }
+
+    if (type === 'group') {
+      const lastTypedGroup = library?.groups.find(grp => grp.id === lastTypedId);
+      if (lastTypedGroup) defaultState = {
+        mode: "group",
+        typingText: generateTypingTextFromGroup(lastTypedGroup),
+        progress: 0,
+        startedAt: Date.now(),
+        finishedAt: undefined,
+        source: { type: "group", id: lastTypedGroup.id, name: lastTypedGroup.name },
+      }
+    }
+  }
+
   const [state, setState] = useState<TypingState>(defaultState);
+
+  const [isCreatingTypingText, setIsCreatingTypingText] = useState<boolean>(false);
 
   const progressRef = useRef<number>(0);
 
@@ -59,7 +93,8 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       startedAt: 0,
       elapsedPaused: 0,
       isPaused: false,
-      completed: false
+      completed: false,
+      finalWpm: undefined
     };
 
     statusRef.current = initializeStatuses(typingText);
@@ -72,14 +107,14 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       finishedAt: undefined,
       source: { type: "text", id: text.id, name: text.title },
     });
+
+    saveAsLastTyped("text", text);
   };
 
   const startGroup = (group: Group) => {
-    const selectedTexts = group.group_texts.map(txtObj => {
-      return getPortionByImportance(txtObj.text, txtObj.importance as "high" | "medium" | "low");
-    });
+    setIsCreatingTypingText(true);
 
-    const typingText = shuffle(selectedTexts).join(" ").trim();
+    const typingText = generateTypingTextFromGroup(group);
 
     progressRef.current = 0;
     currentIndexRef.current = 0;
@@ -90,19 +125,22 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
       startedAt: 0,
       elapsedPaused: 0,
       isPaused: false,
-      completed: false
+      completed: false,
     };
 
     statusRef.current = initializeStatuses(typingText);
 
     setState({
       mode: "group",
-      typingText: typingText,
+      typingText,
       progress: 0,
       startedAt: Date.now(),
       finishedAt: undefined,
       source: { type: "group", id: group.id, name: group.name },
     });
+
+    setIsCreatingTypingText(false);
+    saveAsLastTyped("group", group);
   };
 
   const resetRound = () => {
@@ -215,7 +253,8 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
         pause,
         resume,
         currentIndexRef,
-        statusRef
+        statusRef,
+        isCreatingTypingText
       }}
     >
       {children}

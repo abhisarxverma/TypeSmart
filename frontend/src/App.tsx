@@ -34,7 +34,7 @@ export default function App() {
         </ProtectedRoute>
       }>
         <Route path="library" element={<Library />} />
-        <Route path="add-text" element={<AddText />} />
+        <Route path="library/add-text" element={<AddText />} />
         <Route path="library/text/:id" element={<TextDetails />} />
         <Route path="library/edit-text/:id" element={<EditText />} />
         <Route path="library/group/:id" element={<GroupDetails />} />

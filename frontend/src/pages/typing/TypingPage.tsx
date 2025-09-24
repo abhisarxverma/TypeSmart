@@ -8,9 +8,10 @@ import { IoIosPause } from "react-icons/io";
 import { VscDebugRestart } from "react-icons/vsc";
 import { FaPlay } from "react-icons/fa";
 import RoundCompleted from "@/components/typing/TypingInterface/RoundCompleted";
+import { Loader } from "lucide-react";
 
 export default function TypingPage() {
-  const { state, getCurrentStats, resetRound, statsRef, resume, pause } = useTyping();
+  const { state, getCurrentStats, resetRound, statsRef, resume, pause, isCreatingTypingText } = useTyping();
 
   const [stats, setStats] = useState({ wpm: 0 });
 
@@ -62,7 +63,7 @@ export default function TypingPage() {
         )}
       </div>
 
-      {isCompleted ? <RoundCompleted wpm={stats.wpm} restartFn={resetRound} /> : <TypingInterface containerRef={typingContainerRef} />}
+      {isCompleted ? <RoundCompleted wpm={stats.wpm} restartFn={resetRound} /> : !isCreatingTypingText ? <TypingInterface containerRef={typingContainerRef} /> : <div className="min-h-[50vh] flex items-center justify-center"><Loader className="text-primary animate-spin"/></div>}
 
       <ProgressBar addClass="mt-10" />
 

@@ -33,8 +33,6 @@ export function normalizeForTyping(input: string): string {
   t = t.replace(/ {2,}/g, " ");
 
   // Normalize line breaks:
-  // - Trim spaces around newlines
-  // - Ensure single \n, not \r\n or multiple \n
   t = t.replace(/\r\n?/g, "\n");
   t = t.replace(/ *\n */g, "\n"); 
   t = t.replace(/\n{2,}/g, "\n\n");
@@ -42,39 +40,17 @@ export function normalizeForTyping(input: string): string {
   // Strip non-typable symbols (only allow common punctuation + newlines)
   t = t.replace(/[^.,!?;:'"()\[\]{}<>\-_\/@#*$%+=A-Za-z0-9 \n]/g, "");
 
+  // Convert to lowercase for smoother typing flow
+  t = t.toLowerCase();
+
   // Trim leading/trailing spaces
   t = t.trim();
 
   return t;
 }
 
+
 export function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
-export function chunkAndShuffle(text: string, wordsPerChunk: number = 100): string {
-  const words = text.split(/\s+/); 
-  const chunks: string[] = [];
-
-  for (let i = 0; i < words.length; i += wordsPerChunk) {
-    chunks.push(words.slice(i, i + wordsPerChunk).join(" "));
-  }
-
-  const shuffled = chunks.sort(() => Math.random() - 0.5);
-
-  return shuffled.join(" ");
-}
-
-export function sentenceShuffle(text: string): string {
-  const sentences = text.split(/([.?!])\s+/).reduce((acc, part, idx, arr) => {
-    if (/[.?!]/.test(part) && arr[idx + 1]) {
-      acc[acc.length - 1] += part; 
-    } else {
-      acc.push(part);
-    }
-    return acc;
-  }, [] as string[]);
-
-  const shuffled = sentences.sort(() => Math.random() - 0.5);
-  return shuffled.join(" ");
-}

@@ -47,6 +47,7 @@ interface TypingContextType {
   getCurrentStats: () => Stats;
   pause: () => void;
   resume: () => void;
+  isCreatingTypingText: boolean;
 }
 
 export const TypingContext = createContext<TypingContextType | null>(null);

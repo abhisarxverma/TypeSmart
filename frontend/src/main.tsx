@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AuthProvider from './Contexts/AuthProvider.tsx'
-import TypingProvider from './Contexts/TypingProvider.tsx'
+import ThemeProvider from './Contexts/ThemeProvider.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,11 +26,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter >
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-            <TypingProvider>
-              <App />
-            </TypingProvider>
-        </AuthProvider>
+        <ThemeProvider defaultTheme="default-dark" storageKey="vite-ui-theme">
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </StrictMode>,
