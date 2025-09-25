@@ -30,8 +30,10 @@ app.get(/^\/(?!api).*/, (req, res) => {
     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
 })
 
-const port = process.env.PORT || 5000;
+// const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
-    console.log(`Server is running on PORT - ${port}`)
-})
+// app.listen(port, () => {
+//     console.log(`Server is running on PORT - ${port}`)
+// })
+
+module.exports = app;
