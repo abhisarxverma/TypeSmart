@@ -36,4 +36,4 @@ app.get(/^\/(?!api).*/, (req, res) => {
 //     console.log(`Server is running on PORT - ${port}`)
 // })
 
-module.exports = app;
+export default app;
