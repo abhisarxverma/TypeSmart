@@ -58,7 +58,7 @@ export default function App() {
 
       <Route path="/login-signup" element={<AuthPage />} />
 
-      <Route path="/home" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage />} />
 
     </Routes>
   )

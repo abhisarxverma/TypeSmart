@@ -19,18 +19,21 @@ export default function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement
+    root.classList.remove("default-dark", "obsidian-dark", "solar-night", "forest-night", "nordic-dark", "dracula-dark")
     root.classList.add(theme)
   }, [theme])
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme)
       const root = window.document.documentElement
-      root.classList.add(theme)
-      setTheme(theme)
+      root.classList.remove("default-dark", "obsidian-dark", "solar-night", "forest-night", "nordic-dark", "dracula-dark")
+      root.classList.add(newTheme)
+      setTheme(newTheme)
     },
   }
+
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>

@@ -68,28 +68,27 @@ export default function TextDetails() {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-7 md:gap-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-3">
                 <div className="flex flex-col">
-                    <h1 className="text-heading-lg font-bold mb-2">{text.title}</h1>
-                    <Badge className="text-[.9rem]" variant="secondary"># {text.tag}</Badge>
+                    <h1 className="text-heading-lg font-bold mb-2 break-words">{text.title}</h1>
+                    <Badge className="text-[.9rem] w-fit" variant="secondary"># {text.tag}</Badge>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <Button onClick={handleType} title="Type this text only" variant="secondary"><FaRegKeyboard /> Type</Button>
                     <Button variant="ghost" className="hover:text-primary" onClick={handleEditClick}>
-                            <FaPencil />
+                        <FaPencil />
                     </Button>
                     <DeleteButton deleteFn={handleDelete} isDeleting={isDeletingText} />
                 </div>
             </div>
 
             <div className="max-h-[80vh] scrollbar-custom overflow-y-auto mt-10">
-                <p className="leading-relaxed text-base [word-spacing:.2em]">
+                <p className="leading-relaxed text-base [word-spacing:.2em] break-words">
                     {text.text}
                 </p>
             </div>
 
             <PresentInGroups text={text} groups={presentInGroups} />
-
         </>
     )
 }

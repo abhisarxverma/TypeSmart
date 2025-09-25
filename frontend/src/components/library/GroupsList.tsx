@@ -13,7 +13,7 @@ export default function GroupsList() {
 
     const { library, isFetchingLibrary } = useLibrary();
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const groups: Group[] = useSearch(library.groups, searchQuery, ["name", "tag"]);
+    const groups: Group[] = useSearch(library.groups ?? [], searchQuery, ["name", "tag"]);
 
     const renderedGroups = useMemo(() => {
         return groups.map((group) => <GroupCard group={group} key={group.id} />);

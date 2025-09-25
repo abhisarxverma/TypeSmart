@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useMode } from "./useMode";
+import axios from "axios";
 
 export function useGetRealUserQuery(token: string | null) {
 
@@ -42,8 +43,11 @@ export function useGetLibraryQuery() {
                 if (data.error) throw new Error(data.error);
                 return data;
             } catch (error) {
-                console.log("Error in library fetch query : ", error)
-                throw new Error(error?.response?.data?.error ?? "Failed to fetch library");
+                if (axios.isAxiosError(error) && error.response?.data?.error) {
+                    throw new Error(error.response.data.error);
+                }
+                throw new Error("Failed to fetch library");
+
             }
         },
         staleTime: Infinity,
@@ -58,7 +62,7 @@ export function useAddTextMutation({ text, title, tag }: { text: string, tag: st
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const libraryRoute = giveLibraryRoute();
+    const libraryRoute = giveLibraryRoute("main");
 
     const { mutate: addText, isPending: isAddingText } = useMutation({
         mutationFn: async () => {
@@ -279,7 +283,7 @@ export function useCreateGroupMutation({ name, tag }: { name: string, tag: strin
                 ...old,
                 groups: [group, ...(old?.groups || [])]
             }));
-            navigate(giveGroupDetailsRoute(data.id));
+            navigate(giveGroupDetailsRoute(data.id, "main"));
         }
     });
 
@@ -291,7 +295,7 @@ export function useDeleteTextMutation(textId: string) {
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const libraryRoute = giveLibraryRoute();
+    const libraryRoute = giveLibraryRoute("main");
 
     const { mutate: deleteText, isPending: isDeletingText } = useMutation({
         mutationFn: async () => {

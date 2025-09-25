@@ -1,4 +1,3 @@
-
 import TextForm from "@/components/layouts/TextForm";
 import { Button } from "@/components/ui/button";
 import FileReference from "@/components/uploaders/FileReference";
@@ -19,8 +18,7 @@ export default function AddText() {
             <h1 className="text-heading">Add New Text</h1>
             <p className="text-subheading mt-1">Add new text to your collection from various sources</p>
 
-            <div className="flex flex-col md:flex-row justify-between mt-10 min-h-[400px] gap-10">
-
+            <div className="flex flex-col lg:flex-row justify-between mt-10 min-h-[400px] gap-10">
                 <TextForm
                     text={text}
                     title={title}
@@ -37,7 +35,13 @@ export default function AddText() {
                 </div>
             </div>
 
-            <Button onClick={() => addText()} disabled={title === "" || tag === "" || text === "" || isAddingText} className="md:w-80 w-full mt-10">{isAddingText ? <Loader2 className="animate-spin" /> : "Add Text"}</Button>
+            <Button 
+                onClick={() => addText()} 
+                disabled={title === "" || tag === "" || text === "" || isAddingText} 
+                className="lg:w-80 w-full mt-10"
+            >
+                {isAddingText ? <Loader2 className="animate-spin" /> : "Add Text"}
+            </Button>
         </>
     )
 }

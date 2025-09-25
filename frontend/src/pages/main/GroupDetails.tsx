@@ -4,7 +4,7 @@ import LoaderPage from "../utils/LoaderPage";
 import NotFound from "../utils/NotFound";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FaKeyboard, FaPlus } from "react-icons/fa6";
+import { FaKeyboard, FaLayerGroup, FaPlus } from "react-icons/fa6";
 import NoTexts from "@/components/library/GroupDetails/NoTexts";
 import TextPresentCard from "@/components/library/GroupDetails/TextPresentCard";
 import ListLayout from "@/components/layouts/ListLayout";
@@ -16,10 +16,14 @@ import { giveTypingPageRoute } from "@/utils/routing";
 import toast from "react-hot-toast";
 import { useMode } from "@/Hooks/useMode";
 import { useProtectFeature } from "@/utils/protection";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function GroupDetails() {
 
     const { mode } = useMode();
+
+    const [ isCreatingText, setIsCreatingText ] = useState<boolean>(false);
 
     const { id: groupId } = useParams();
 
@@ -45,6 +49,7 @@ export default function GroupDetails() {
             toast.error("Group is empty, please add text to type.");
             return;
         }
+        setIsCreatingText(true);
         startGroup(group)
         navigate(giveTypingPageRoute(mode));
     }
@@ -53,11 +58,11 @@ export default function GroupDetails() {
         <>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-3">
                 <div className="flex flex-col">
-                    <h1 className="text-heading font-bold mb-2">{group.name}</h1>
-                    <Badge className="text-[.9rem]" variant="secondary"># {group.tag}</Badge>
+                    <h1 className="text-heading font-bold mb-2 flex items-center gap-2 break-words"><FaLayerGroup />{group.name}</h1>
+                    <Badge className="text-[.9rem] w-fit" variant="secondary"># {group.tag}</Badge>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button onClick={handleType} variant="secondary"><FaKeyboard /> Type</Button>
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button onClick={handleType} variant="secondary"><FaKeyboard />{isCreatingText && <Loader2 className="animate-spin"/>} Type</Button>
                     <AddTextDialog group={group}>
                         <Button variant="ghost"><FaPlus /> Add Text</Button>
                     </AddTextDialog>
@@ -76,7 +81,6 @@ export default function GroupDetails() {
                     )}
                 </div>
             </div>
-
         </>
     )
 }

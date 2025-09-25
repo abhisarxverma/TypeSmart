@@ -30,17 +30,17 @@ export default function Header() {
         { name: "Forest Night", value: "forest-night" as const },
         { name: "Dracula Dark", value: "dracula-dark" as const },
         { name: "Nordic Dark", value: "nordic-dark" as const },
-        { name: "Default Dark", value: "default-dark" as const },
+        { name: "Space Dark", value: "default-dark" as const },
     ];
 
     return (
-        <header className="flex items-center justify-between border-b border-border py-3 px-3 md:px-8">
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border py-3 px-3 md:px-8 gap-3">
             <div className="flex items-center gap-2 cursor-pointer">
                 <img className="h-8 aspect-square" src="/logo.png" alt="Typesmart logo image" />
-                <Link to="/home" className="text-xl font-bold">TypeSmart</Link>
+                <Link to="/" className="text-xl font-bold">TypeSmart</Link>
                 {mode === "demo" && <Badge title="This is demo mode">Demo</Badge>}
             </div>
-            <nav className="flex items-center gap-1">
+            <nav className="flex flex-wrap items-center gap-2">
                 <Button variant="ghost" asChild>
                     <Link to={giveTypingPageRoute(mode)}>Type</Link>
                 </Button>

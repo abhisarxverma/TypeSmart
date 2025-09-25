@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useMode } from "@/Hooks/useMode";
 import { giveLibraryRoute } from "@/utils/routing";
 import Confetti from "react-confetti";
 import { VscDebugRestart } from "react-icons/vsc";
@@ -8,6 +9,7 @@ import { useWindowSize } from "react-use";
 export default function RoundCompleted({ wpm, restartFn }: { wpm: number, restartFn: () => void }) {
 
     const { width, height } = useWindowSize();
+    const { mode } = useMode();
 
     return (
         <div className="flex flex-col items-center justify-center py-10 text-center">
@@ -23,7 +25,7 @@ export default function RoundCompleted({ wpm, restartFn }: { wpm: number, restar
             <div className="flex gap-4">
                 <Button onClick={restartFn}><VscDebugRestart /> Restart</Button>
                 <Button variant="secondary" asChild>
-                    <Link to={giveLibraryRoute()}>Go to Library</Link>
+                    <Link to={giveLibraryRoute(mode)}>Go to Library</Link>
                 </Button>
             </div>
         </div>

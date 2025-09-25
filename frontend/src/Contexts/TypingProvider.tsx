@@ -37,7 +37,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     const type = lastTyped.type;
     const lastTypedId = lastTyped.id;
     if (type === 'text') {
-      const lastTypedText = library.texts.find(txt => txt.id === lastTypedId);
+      const lastTypedText = library?.texts.find(txt => txt.id === lastTypedId);
       if (lastTypedText) defaultState = {
         mode: "text",
         typingText: lastTypedText.text,
@@ -90,7 +90,7 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
     statsRef.current = {
       correct: 0,
       incorrect: 0,
-      startedAt: 0,
+      startedAt: Date.now(),
       elapsedPaused: 0,
       isPaused: false,
       completed: false,
@@ -114,33 +114,36 @@ export default function TypingProvider({ children }: { children: ReactNode }) {
   const startGroup = (group: Group) => {
     setIsCreatingTypingText(true);
 
-    const typingText = generateTypingTextFromGroup(group);
-
-    progressRef.current = 0;
-    currentIndexRef.current = 0;
-
-    statsRef.current = {
-      correct: 0,
-      incorrect: 0,
-      startedAt: 0,
-      elapsedPaused: 0,
-      isPaused: false,
-      completed: false,
-    };
-
-    statusRef.current = initializeStatuses(typingText);
-
-    setState({
-      mode: "group",
-      typingText,
-      progress: 0,
-      startedAt: Date.now(),
-      finishedAt: undefined,
-      source: { type: "group", id: group.id, name: group.name },
-    });
-
-    setIsCreatingTypingText(false);
-    saveAsLastTyped("group", group);
+    setTimeout(() => {
+      
+      const typingText = generateTypingTextFromGroup(group);
+  
+      progressRef.current = 0;
+      currentIndexRef.current = 0;
+  
+      statsRef.current = {
+        correct: 0,
+        incorrect: 0,
+        startedAt: Date.now(),
+        elapsedPaused: 0,
+        isPaused: false,
+        completed: false,
+      };
+  
+      statusRef.current = initializeStatuses(typingText);
+  
+      setState({
+        mode: "group",
+        typingText,
+        progress: 0,
+        startedAt: Date.now(),
+        finishedAt: undefined,
+        source: { type: "group", id: group.id, name: group.name },
+      });
+  
+      setIsCreatingTypingText(false);
+      saveAsLastTyped("group", group);
+    }, 0)
   };
 
   const resetRound = () => {
