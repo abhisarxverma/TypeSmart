@@ -5,7 +5,6 @@ export function getAccessToken(req) {
   if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
     return authHeader.slice('Bearer '.length)
   }
-  // Fallbacks if you decide to store tokens in cookies (HttpOnly recommended)
   return req.cookies?.['sb-access-token'] || req.cookies?.['access_token'] || null
 }
 

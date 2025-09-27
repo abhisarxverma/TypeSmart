@@ -94,6 +94,7 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
             </div>
             <div className="grid grid-cols-[auto_1fr] gap-1 items-center mt-auto">
                 <span className="text-muted-foreground text-[.8rem]">Importance : </span>
+                {isUpdatingImportance ? <p className="flex items-center gap-2 text-md"><span>Updating</span> <Loader2 className="animate-spin" /></p> : (
                 <Select value={importance} onValueChange={handleImportanceChange}>
                     <SelectTrigger className={"w-full border-0 font-semibold " + importanceColor}>
                         <SelectValue placeholder="Importance" />
@@ -103,7 +104,7 @@ export default function TextPresentCard({ text, groupId }: { text: TextInGroup, 
                         <SelectItem value="medium" className="text-yellow-300">Medium</SelectItem>
                         <SelectItem value="low" className="text-green-400">Low</SelectItem>
                     </SelectContent>
-                </Select>
+                </Select>)}
             </div>
             <div className="flex gap-2 justify-end mt-auto">
                 <Button onClick={() => navigate(editDetailsRoute)} variant="ghost" className=""><FaPencil /></Button>
