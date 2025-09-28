@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .utils import is_clean_text, send_email
 
+
 def get_user_view(request):
     sb = getattr(request, "sb", None)
     user = getattr(request, "sb_user", None)
@@ -12,35 +13,27 @@ def get_user_view(request):
         return JsonResponse({"error": "Not authenticated"}, status=401)
 
     try:
-        existing_resp = sb.table("users").select("*").eq("id", user.id).single().execute()
+        existing_resp = sb.table("users").select("*").eq("id", user.id).execute()
 
         print("EXISTING USER : ", existing_resp)
 
-        if existing_resp.data:
-            return JsonResponse(existing_resp.data, status=200, safe=False)
+        if existing_resp.data and len(existing_resp.data) > 0:
+            return JsonResponse(existing_resp.data[0], status=200, safe=False)
 
-        insert_resp = (
-            sb.table("users")
-            .insert(
-                {
-                    "id": user.id,
-                    "email": user.email,
-                    "full_name": user.user_metadata.get("full_name", ""),
-                    "avatar_url": user.user_metadata.get("avatar_url", ""),
-                }
-            )
-            .select("*")
-            .single()
-            .execute()
-        )
+        insert_resp = sb.table("users").insert({
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.user_metadata.get("full_name", ""),
+            "avatar_url": user.user_metadata.get("avatar_url", ""),
+        }).execute()
 
-        if insert_resp.error:
+        if not insert_resp.data or len(insert_resp.data) == 0:
             return JsonResponse(
-                {"error": "Failed to create new user", "details": insert_resp.error},
+                {"error": "Failed to create new user", "details": insert_resp},
                 status=500,
             )
 
-        return JsonResponse(insert_resp.data, status=200, safe=False)
+        return JsonResponse(insert_resp.data[0], status=200, safe=False)
 
     except Exception as e:
         print("ERROR IN GET USER VIEW : ", e)

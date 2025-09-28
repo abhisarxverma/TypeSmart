@@ -29,8 +29,8 @@ export default function Library() {
 
     if (isFetchingLibrary) {
         return (
-            <div className="min-h-screen">
-                <Loader2 className="animate-spin text-5xl" />
+            <div className="min-h-[80vh] flex items-center justify-center gap-2">
+                <span>Loading your library</span> <Loader2 className="animate-spin text-5xl" />
             </div>
         )
     }

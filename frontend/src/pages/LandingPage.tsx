@@ -18,6 +18,12 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/Hooks/useAuth";
 
+import logo from "../assets/logo.png";
+import feature1 from "../assets/screenshots/feature-pdf.png";
+import feature2 from "../assets/screenshots/feature-group.png";
+import feature3 from "../assets/screenshots/feature-typing-interface.png";
+import profile from "../assets/profile.jpg";
+
 export default function LandingPage() {
     const [feedbackText, setFeedbackText] = useState<string>("");
 
@@ -29,47 +35,50 @@ export default function LandingPage() {
 
     return (
         <div className="min-h-screen grid grid-cols-1 grid-rows-[auto_1fr_auto]">
-            <header className="flex items-center justify-between py-3 px-3 md:px-8 border-b-2 border-secondary">
+            <header className="flex flex-wrap items-center gap-2 justify-between py-3 px-3 md:px-8 border-b-2 border-secondary">
                 <div className="flex items-center gap-2">
                     <img
                         className="h-8 aspect-square"
-                        src="/logo.png"
+                        src={logo}
                         alt="Typesmart logo image"
                     />
                     <span className="text-xl font-bold">TypeSmart</span>
                 </div>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="ghost">
-                            <MdOutlineFeedback /> Give Feedback
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-[300px]">
-                        <DialogHeader>
-                            <DialogTitle>Share your valuable feedback</DialogTitle>
-                            <DialogDescription className="flex flex-col gap-5 mt-3">
-                                <Textarea
-                                    onChange={(e) => setFeedbackText(e.target.value)}
-                                    placeholder="Send your reviews, suggestions, advices, critiques straight to me...."
-                                    className="resize-none min-h-[150px]"
-                                />
-                                <Button onClick={() => sendFeedback()}>
-                                    {isSendingFeedback ? (
-                                        <Loader2 className="animate-spin" />
-                                    ) : (
-                                        <BsSend />
-                                    )}{" "}
-                                    Send feedback
-                                </Button>
-                            </DialogDescription>
-                        </DialogHeader>
-                    </DialogContent>
-                </Dialog>
+                <div className="flex items-center gap-2 flex-wrap">
+                    <Link to="https://github.com/abhisarxverma/TypeSmart"><FaGithub size="1.5rem" className="hover:text-primary transition-all duration-300" /></Link>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="ghost">
+                                <MdOutlineFeedback /> Give Feedback
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-[300px]">
+                            <DialogHeader>
+                                <DialogTitle>Share your valuable feedback</DialogTitle>
+                                <DialogDescription className="flex flex-col gap-5 mt-3">
+                                    <Textarea
+                                        onChange={(e) => setFeedbackText(e.target.value)}
+                                        placeholder="Send your reviews, suggestions, advices, critiques straight to me...."
+                                        className="resize-none min-h-[150px]"
+                                    />
+                                    <Button onClick={() => sendFeedback()}>
+                                        {isSendingFeedback ? (
+                                            <Loader2 className="animate-spin" />
+                                        ) : (
+                                            <BsSend />
+                                        )}{" "}
+                                        Send feedback
+                                    </Button>
+                                </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </header>
 
-            <div className="min-h-[75vh] max-w-5xl text-center flex flex-col justify-center align-center mx-auto px-4 py-20">
+            <div className="min-h-[75vh] max-w-5xl text-center flex flex-col justify-center align-center mx-auto px-4 py-20 border-b-2 border-secondary">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-                    Subconscious learning through chill typing
+                    Chill typing meets subconscious learning
                 </h1>
                 <p className="text-gray-400 font-semibold mt-5 max-w-2xl mx-auto">
                     Upload your own texts in library, make groups, start typing and grow
@@ -94,16 +103,16 @@ export default function LandingPage() {
                         <Link to={giveTypingPageRoute("demo")}>Take Demo</Link>
                     </Button>
                 </div>
-                <div className="flex items-center gap-2 justify-center mt-16">
+                <Link to="https://github.com/abhisarxverma/TypeSmart" className="flex items-center gap-2 justify-center mt-16 hover:text-primary transition-all duration-300">
                     <FaGithub />
-                    <p className="text-lg font-semibold">Github Open Sourced</p>
-                </div>
+                    <p className="text-lg font-semibold ">Github Open Sourced</p>
+                </Link>
             </div>
 
             <div className="max-w-6xl mx-auto px-4 flex flex-col gap-20 mt-15">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                     <img
-                        src="/screenshots/feature-pdf.png"
+                        src={feature1}
                         alt="Screenshot of adding text with PDF reference"
                         className="w-full rounded-2xl shadow-lg border-1 border-muted-foreground"
                     />
@@ -133,14 +142,14 @@ export default function LandingPage() {
                         </p>
                     </div>
                     <img
-                        src="/screenshots/feature-group.png"
+                        src={feature2}
                         alt="Screenshot of group and importance management"
                         className="w-full rounded-2xl shadow-lg order-1 md:order-2 border-1 border-muted-foreground"
                     />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                     <img
-                        src="/screenshots/feature-typing-interface.png"
+                        src={feature3}
                         alt="Screenshot of distraction-free typing interface"
                         className="w-full rounded-2xl shadow-lg border-1 border-muted-foreground"
                     />
@@ -159,21 +168,21 @@ export default function LandingPage() {
 
 
             <div className="bg-card py-5 px-3 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3 mt-20">
-                <div className="flex items-center gap-2 text-lg font-bold">
+                <div className="flex items-center flex-wrap gap-2 text-lg font-bold">
                     <span className="flex items-center gap-2">
                         <img
                             className="h-6 aspect-square"
-                            src="/logo.png"
+                            src={logo}
                             alt="Typesmart logo image"
                         />{" "}
                         TypeSmart by
                     </span>
                     <Link
                         to="https://www.github.com/abhisarxverma"
-                        className="ms-3 flex items-center gap-2 underline"
+                        className="flex items-center gap-2 underline hover:text-primary transition-all duration-300"
                     >
                         <img
-                            src="/profile.jpg"
+                            src={profile}
                             className="aspect-square rounded-full w-8 inline"
                             alt="profile image of the creator of Typesmart"
                         />{" "}

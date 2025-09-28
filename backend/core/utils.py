@@ -18,8 +18,8 @@ def send_email(message):
                 connection.starttls()
                 connection.login(user=email, password=password)
                 connection.sendmail(from_addr=email,
-                                    to_addrs="abhisarverma163@gmail.com",
-                                    msg=f'Subject:MyTuneTale Website User Review\n\n{message}')
+                                    to_addrs="typesmart.absr@gmail.com",
+                                    msg=f'Subject:Typemsart User Review\n\n{message}')
         except Exception as e :
             return False
 

@@ -7,6 +7,7 @@ import { useMode } from "@/Hooks/useMode";
 import { FaGoogle } from "react-icons/fa6";
 import { Badge } from "./ui/badge";
 import { LuLogOut } from "react-icons/lu";
+import logo from "../assets/logo.png";
 
 import {
     Menubar,
@@ -36,7 +37,7 @@ export default function Header() {
     return (
         <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border py-3 px-3 md:px-8 gap-3">
             <div className="flex items-center gap-2 cursor-pointer">
-                <img className="h-8 aspect-square" src="/logo.png" alt="Typesmart logo image" />
+                <img className="h-8 aspect-square" src={logo} alt="Typesmart logo image" />
                 <Link to="/" className="text-xl font-bold">TypeSmart</Link>
                 {mode === "demo" && <Badge title="This is demo mode">Demo</Badge>}
             </div>

@@ -59,18 +59,24 @@ export function useGetLibraryQuery() {
 }
 
 export function useAddTextMutation({ text, title, tag }: { text: string, tag: string, title: string }) {
-
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const libraryRoute = giveLibraryRoute("main");
 
+    const MAX_TEXT_LENGTH = 65535;
+
     const { mutate: addText, isPending: isAddingText } = useMutation({
         mutationFn: async () => {
+            const trimmedText = text.length > MAX_TEXT_LENGTH
+                ? text.slice(0, MAX_TEXT_LENGTH)
+                : text;
+
             const res = await api.post("/library/add_text", {
                 title,
-                text,
+                text: trimmedText,
                 tag
             });
+
             const data = res.data;
             if (data?.error) throw new Error(data.error);
             return data;
@@ -86,8 +92,8 @@ export function useAddTextMutation({ text, title, tag }: { text: string, tag: st
     });
 
     return { addText, isAddingText };
-
 }
+
 
 export function useEditTextMutation({ text, title, tag, textId }: { text: string, tag: string, title: string, textId: string }) {
     const queryClient = useQueryClient();

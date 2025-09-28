@@ -13,7 +13,7 @@ export default function TextsList() {
 
     const { library, isFetchingLibrary } = useLibrary();
     const [ searchQuery, setSearchQuery ] = useState<string>("");
-    const texts: Text[] = useSearch(library.texts ?? [], searchQuery, ["title", "tag"]);
+    const texts: Text[] = useSearch(library?.texts ?? [], searchQuery, ["title", "tag"]);
 
     const renderedTexts = useMemo(() => {
         return texts.map((text) => <TextCard text={text} key={text.id} />);
