@@ -26,7 +26,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter >
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="default-dark" storageKey="vite-ui-theme">
+        <ThemeProvider defaultTheme="obsidian-dark" storageKey="vite-ui-theme">
           <AuthProvider>
             <App />
           </AuthProvider>
