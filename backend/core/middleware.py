@@ -99,7 +99,7 @@ class RateLimitMiddleware:
         current_requests = [req_time for req_time in current_requests 
                           if now - req_time < 3600]
         
-        if len(current_requests) >= 7:
+        if len(current_requests) >= 10:
             return JsonResponse({"status":"failed", "message":"Too many requests. Try again later."}, status=429)
         
         current_requests.append(now)
